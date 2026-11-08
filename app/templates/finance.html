@@ -1,0 +1,35 @@
+{% extends "dashboard.html" %}
+{% block title %}{{ t.finance }}{% endblock %}
+{% block content %}
+<h1>{{ t.finance }}</h1>
+<p><a href="/finance/settings">{{ t.finance_settings }}</a></p>
+{% if not config %}<p class="alert alert-info">{{ t.currency_required }}</p>{% endif %}
+<form method="get" action="/finance" class="mb-3">
+  <div class="form-group"><label for="kind">{{ t.finance }}</label>
+    <select class="form-control" id="kind" name="kind">
+      {% for value in ['receivable','payable'] %}<option value="{{ value }}" {% if kind == value %}selected{% endif %}>{{ t[value] }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="form-group"><label for="state">{{ t.status }}</label>
+    <select class="form-control" id="state" name="state">
+      {% for value in ['open','paid','canceled','all'] %}<option value="{{ value }}" {% if state == value %}selected{% endif %}>{{ t[value] }}</option>{% endfor %}
+    </select>
+  </div>
+  <button class="btn btn-outline-dark">{{ t.filter }}</button>
+</form>
+{% if config %}<a class="btn btn-outline-dark mb-3" href="/finance/new/{{ kind }}">{{ t.new_title }}</a>{% endif %}
+<ul class="list-group mb-3">
+{% for title in titles %}
+<li class="list-group-item text-break">
+  <h2 class="h5"><a href="/finance/{{ title.id }}">#{{ title.id }} · {{ title.description }}</a></h2>
+  <p>{{ t.amount }} {{ title.currency }} {{ money(title.amount_minor, title.scale, locale) }}</p>
+  <p>{{ t.remaining }} {{ title.currency }} {{ money(0 if title.canceled else title.amount_minor - title.paid, title.scale, locale) }}</p>
+  <p class="mb-0">{{ t.due_date }} {{ title.due_date.strftime('%d/%m/%Y') }} · {{ t.canceled if title.canceled else t.paid if title.amount_minor == title.paid else t.open }}{% if title.overdue %} · <strong>{{ t.overdue }}</strong>{% endif %}</p>
+</li>
+{% else %}<li class="list-group-item">{{ t.no_titles }}</li>{% endfor %}
+</ul>
+<nav>
+{% if page > 1 %}<a class="btn btn-outline-dark" href="?kind={{ kind }}&amp;state={{ state }}&amp;page={{ page - 1 }}">{{ t.previous_page }}</a>{% endif %}
+{% if has_next %}<a class="btn btn-outline-dark" href="?kind={{ kind }}&amp;state={{ state }}&amp;page={{ page + 1 }}">{{ t.next_page }}</a>{% endif %}
+</nav>
+{% endblock %}

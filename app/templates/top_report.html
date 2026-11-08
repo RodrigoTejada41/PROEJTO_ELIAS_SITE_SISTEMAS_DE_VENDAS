@@ -1,0 +1,28 @@
+{% extends "dashboard.html" %}
+{% block title %}{{ t.top_products }}{% endblock %}
+{% block content %}
+<h1>{{ t.top_products }}</h1>
+{% include "report_nav.html" %}
+{% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
+<form method="get" action="/reports/top-products" class="mb-3">
+  {% include "report_dates.html" %}
+  <div class="form-group"><label for="q">{{ t.search }}</label><input class="form-control" id="q" name="q" maxlength="160" value="{{ query }}"></div>
+  <button class="btn btn-outline-dark">{{ t.filter }}</button>
+  <button class="btn btn-outline-dark" name="export" value="true">{{ t.export_csv }}</button>
+</form>
+<div class="table-responsive">
+  <table class="table table-sm table-striped">
+    <thead><tr><th scope="col">#</th><th scope="col">{{ t.code }}</th><th scope="col">{{ t.description }}</th><th scope="col">{{ t.quantity }}</th></tr></thead>
+    <tbody>
+    {% for row in rows %}
+      <tr><td>{{ (page - 1) * 50 + loop.index }}</td><th scope="row">{{ row.code_snapshot }}</th><td class="text-break">{{ row.description }}</td><td>{{ row.quantity }}</td></tr>
+    {% else %}<tr><td colspan="4">{{ t.report_no_products }}</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% set query_link = 'start=' ~ (start|urlencode) ~ '&end=' ~ (end|urlencode) ~ '&seller_id=' ~ (seller_id or '') ~ '&q=' ~ (query|urlencode) %}
+<nav>
+{% if page > 1 %}<a class="btn btn-outline-dark" href="?page={{ page - 1 }}&amp;{{ query_link }}">{{ t.previous_page }}</a>{% endif %}
+{% if has_next %}<a class="btn btn-outline-dark" href="?page={{ page + 1 }}&amp;{{ query_link }}">{{ t.next_page }}</a>{% endif %}
+</nav>
+{% endblock %}

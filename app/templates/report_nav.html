@@ -1,0 +1,15 @@
+{% set period_link = 'start=' ~ (start|default('')|urlencode) ~ '&end=' ~ (end|default('')|urlencode) %}
+{% set seller_link = '&seller_id=' ~ seller_id if seller_id else '' %}
+<nav aria-label="{{ t.reports }}" class="d-flex flex-wrap mb-3">
+  {% for path, label, filters in [
+    ('/reports', 'report_stock', ''),
+    ('/reports/sales', 'sales_report', period_link ~ seller_link),
+    ('/reports/top-products', 'top_products', period_link ~ seller_link),
+    ('/reports/cash', 'cash_flow', period_link)
+  ] %}
+  {% if is_master or path == '/reports' %}
+  <a class="btn btn-sm mr-2 mb-2 {{ 'btn-dark' if request.url.path == path else 'btn-outline-dark' }}"
+     href="{{ path ~ '?' ~ filters if filters else path }}" {% if request.url.path == path %}aria-current="page"{% endif %}>{{ t[label] }}</a>
+  {% endif %}
+  {% endfor %}
+</nav>

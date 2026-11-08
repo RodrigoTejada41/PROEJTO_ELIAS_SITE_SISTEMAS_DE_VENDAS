@@ -1,0 +1,19 @@
+{% extends "dashboard.html" %}
+{% block title %}{{ t[kind] }}{% endblock %}
+{% block content %}
+<h1>{{ t[kind] }} · {{ t.edit_sku if party.id else t.new_contact }}</h1>
+<p><a href="/contacts/{{ kind }}">{{ t.back }}</a></p>
+{% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
+<form method="post" action="/contacts/{{ kind }}/{{ (party.id|string ~ '/edit') if party.id else 'new' }}">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  {% if party.id %}<input type="hidden" name="version" value="{{ party.version }}">{% endif %}
+  {% for field, limit in [('name',160), ('external_ref',64), ('contact',160), ('phone',40), ('email',254)] %}
+  <div class="form-group">
+    <label for="{{ field }}">{{ t[field] }}</label>
+    <input class="form-control" id="{{ field }}" name="{{ field }}" value="{{ party[field] or '' }}" maxlength="{{ limit }}"
+           {% if field == 'name' %}required{% elif field == 'email' %}type="email"{% elif field == 'phone' %}type="tel"{% endif %}>
+  </div>
+  {% endfor %}
+  <button class="btn btn-outline-dark" type="submit">{{ t.save_sku }}</button>
+</form>
+{% endblock %}

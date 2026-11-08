@@ -1,0 +1,2 @@
+# Preserve exact bytes of checksummed migrations across Windows and Linux.
+migrations/*.sql -text

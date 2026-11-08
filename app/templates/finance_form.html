@@ -1,0 +1,23 @@
+{% extends "dashboard.html" %}
+{% block title %}{{ t.new_title }}{% endblock %}
+{% block content %}
+<h1>{{ t.new_title }} · {{ t[kind] }}</h1>
+{% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
+{% if config %}
+<p>{{ config.currency }} · {{ t.scale }} {{ config.scale }}</p>
+<form action="/finance/new/{{ kind }}" method="post">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <input type="hidden" name="request_key" value="{{ request_key }}">
+  <div class="form-group"><label for="currency">{{ t.currency }}</label><select class="form-control" id="currency" name="currency">{% for currency in ['USD','PYG'] %}<option value="{{ currency }}" {% if (form.currency or config.currency) == currency %}selected{% endif %}>{{ currency }}</option>{% endfor %}</select></div>
+  <div class="form-group"><label for="description">{{ t.description }}</label><input class="form-control" id="description" name="description" maxlength="160" value="{{ form.description or '' }}" required></div>
+  <div class="form-group">
+    <label for="party_id">{{ t.party }}</label>
+    <input class="form-control" type="number" id="party_id" name="party_id" min="1" list="parties" value="{{ form.party_id or '' }}">
+    <datalist id="parties">{% for party in parties %}<option value="{{ party.id }}">{{ party.name }}</option>{% endfor %}</datalist>
+  </div>
+  <div class="form-group"><label for="amount">{{ t.amount }}</label><input class="form-control" inputmode="decimal" id="amount" name="amount" maxlength="22" value="{{ form.amount or '' }}" required></div>
+  <div class="form-group"><label for="due_date">{{ t.due_date }}</label><input class="form-control" type="date" id="due_date" name="due_date" value="{{ form.due_date or '' }}" required></div>
+  <button class="btn btn-outline-dark">{{ t.save_sku }}</button>
+</form>
+{% else %}<p class="alert alert-info">{{ t.currency_required }}</p><a href="/finance/settings">{{ t.finance_settings }}</a>{% endif %}
+{% endblock %}

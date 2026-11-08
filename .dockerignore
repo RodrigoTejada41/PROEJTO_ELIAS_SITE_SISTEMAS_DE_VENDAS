@@ -1,0 +1,11 @@
+*
+!requirements.txt
+!app/
+!app/**
+!migrations/
+!migrations/**
+!tests/
+!tests/**
+!Dockerfile
+**/__pycache__/
+**/*.pyc

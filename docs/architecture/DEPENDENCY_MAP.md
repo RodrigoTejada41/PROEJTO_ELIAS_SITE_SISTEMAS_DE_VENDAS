@@ -1,0 +1,3 @@
+# Dependências propostas
+
+Identity identifica o ator. Access Control aplica permissões e escopo. Companies e Settings fornecem parâmetros por contratos. Catalog identifica produtos e variações. Inventory controla saldo e movimentos. Sales coordena Catalog, Customers, Inventory, Finance e Commissions. Suppliers fornece referência aos fluxos de compras e contas a pagar. Reports consome projeções autorizadas. Audit recebe eventos dos casos de uso e Localization fornece textos e formatos. Nenhum consumidor deve escrever nas tabelas internas de outro domínio. O mapa será revisado com as primeiras Specs aprovadas.

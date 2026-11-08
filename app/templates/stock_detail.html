@@ -1,0 +1,59 @@
+{% extends "dashboard.html" %}
+{% set locale_target = '/stock/' ~ sku.id %}
+{% block title %}{{ t.stock }} · {{ sku.code }}{% endblock %}
+{% block content %}
+<p><a href="/stock">{{ t.stock }}</a></p>
+<h1 class="h3">{{ sku.code }} · {{ sku.description }}</h1>
+<p class="h4">{{ t.balance }} <strong{% if balance < 0 %} class="text-danger"{% endif %}>{{ balance }}</strong></p>
+{% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
+{% if is_master and sku.active %}
+<form class="card card-body" action="/stock/{{ sku.id }}" method="post">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <input type="hidden" name="request_key" value="{{ request_key }}">
+  <div class="form-group">
+    <label for="kind">{{ t.movement }}</label>
+    <select class="form-control" id="kind" name="kind">
+      <option value="entry">{{ t.entry }}</option>
+      <option value="exit">{{ t.exit }}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="quantity">{{ t.quantity }}</label>
+    <input class="form-control" type="number" min="1" max="1000000000" step="1" id="quantity" name="quantity" required>
+  </div>
+  <div class="form-group">
+    <label for="reason">{{ t.reason }}</label>
+    <input class="form-control" id="reason" name="reason" minlength="3" maxlength="240" required>
+  </div>
+  <button class="btn btn-outline-dark" type="submit">{{ t.movement }}</button>
+</form>
+{% endif %}
+<h2 class="h4">{{ t.history }}</h2>
+<ul class="list-group mb-3">
+{% for m in movements %}
+  <li class="list-group-item text-break">
+    <p><strong>{{ '+' if m.delta > 0 else '' }}{{ m.delta }}</strong> · {{ m.reason }}</p>
+    <p class="small">{{ m.username }} · {{ m.occurred_at.isoformat(timespec='minutes') }}
+       {% if m.compensates_id %} · {{ t.compensate }} #{{ m.compensates_id }}{% endif %}</p>
+    {% if is_master and sku.active and not m.compensated and not m.sale_id %}
+    <details>
+      <summary>{{ t.compensate }} #{{ m.id }}</summary>
+      <form action="/stock/{{ sku.id }}/compensate/{{ m.id }}" method="post" class="mt-2">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input type="hidden" name="request_key" value="{{ request_key }}">
+        <label for="reason-{{ m.id }}">{{ t.reason }}</label>
+        <input class="form-control mb-2" id="reason-{{ m.id }}" name="reason" minlength="3" maxlength="240" required>
+        <button class="btn btn-sm btn-outline-dark" type="submit">{{ t.compensate }} #{{ m.id }}</button>
+      </form>
+    </details>
+    {% endif %}
+  </li>
+{% else %}
+  <li class="list-group-item">{{ t.no_movements }}</li>
+{% endfor %}
+</ul>
+<nav>
+{% if page > 1 %}<a class="btn btn-outline-dark" href="?page={{ page - 1 }}">{{ t.previous_page }}</a>{% endif %}
+{% if has_next %}<a class="btn btn-outline-dark" href="?page={{ page + 1 }}">{{ t.next_page }}</a>{% endif %}
+</nav>
+{% endblock %}

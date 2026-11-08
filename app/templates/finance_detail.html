@@ -1,0 +1,55 @@
+{% extends "dashboard.html" %}
+{% set locale_target = '/finance/' ~ title.id %}
+{% block title %}{{ t.finance }} #{{ title.id }}{% endblock %}
+{% block content %}
+<p><a href="/finance">{{ t.finance }}</a></p>
+<h1 class="h3 text-break">#{{ title.id }} · {{ title.description }}</h1>
+<p>{{ t[title.kind] }} · {{ title.party_name or '' }} · {{ t.due_date }} {{ title.due_date.strftime('%d/%m/%Y') }}</p>
+<p>{{ t.amount }} <strong>{{ title.currency }} {{ money(title.amount_minor, title.scale, locale) }}</strong></p>
+<p>{{ t.settled_amount }} {{ title.currency }} {{ money(title.paid, title.scale, locale) }}</p>
+<p>{{ t.remaining }} <strong>{{ title.currency }} {{ money(0 if title.canceled else title.remaining, title.scale, locale) }}</strong>{% if title.canceled %} · {{ t.canceled }}{% endif %}</p>
+{% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
+{% if not title.canceled and title.remaining > 0 and not title.commission_seller_id %}
+<form action="/finance/{{ title.id }}/settle" method="post" class="card card-body">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <input type="hidden" name="request_key" value="{{ request_key }}">
+  <div class="form-group"><label for="amount">{{ t.amount }}</label><input class="form-control" inputmode="decimal" id="amount" name="amount" maxlength="22" required></div>
+  <div class="form-group"><label for="payment_currency">{{ t.payment_currency }}</label><select class="form-control" id="payment_currency" name="payment_currency">{% for currency in ['USD','PYG'] %}<option value="{{ currency }}" {% if title.currency == currency %}selected{% endif %}>{{ currency }}</option>{% endfor %}</select></div>
+  <div class="form-group"><label for="method">{{ t.method }}</label>
+    <select class="form-control" id="method" name="method" required>
+      <option value=""></option>{% for method in ['cash','transfer','card','other'] %}<option value="{{ method }}">{{ t[method] }}</option>{% endfor %}
+    </select>
+  </div>
+  <button class="btn btn-outline-dark">{{ t.settle }}</button>
+</form>
+{% endif %}
+{% if not title.canceled and title.paid == 0 and not title.sale_id %}
+<details class="mb-3">
+  <summary>{{ t.cancel }} #{{ title.id }}</summary>
+  <form action="/finance/{{ title.id }}/cancel" method="post" class="mt-2"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn btn-outline-danger">{{ t.cancel }} #{{ title.id }}</button></form>
+</details>
+{% endif %}
+{% if title.sale_id %}<p><a href="/sales/{{ title.sale_id }}">{{ t.sale }} #{{ title.sale_id }}</a></p>{% endif %}
+{% if title.commission_seller_id %}<p><a href="/commissions/{{ title.commission_seller_id }}">{{ t.commissions }}</a></p>{% endif %}
+<h2 class="h4">{{ t.history }}</h2>
+<ul class="list-group">
+{% for entry in entries %}
+<li class="list-group-item text-break">
+  <p>#{{ entry.id }} · {{ title.currency }} {{ money(entry.amount_minor, title.scale, locale) }} · {{ t[entry.method] }} · {{ entry.occurred_at.isoformat(timespec='minutes') }}</p>
+  <p>{{ t.payment_currency }} {{ entry.payment_currency }} {{ money(entry.payment_amount_minor,2 if entry.payment_currency == 'USD' else 0,locale) }}</p>
+  {% if entry.applied_rate %}<p>{{ t.fx }} · {{ entry.applied_rate }}{% if entry.rate_source == 'bcp' %}<a href="https://www.bcp.gov.py/webapps/web/cotizacion/monedas" target="_blank" rel="noopener noreferrer">Banco Central del Paraguay</a>{% elif entry.rate_source == 'exchangerate_api' %} · <a href="https://www.exchangerate-api.com" target="_blank" rel="noopener noreferrer">Rates By ExchangeRate-API</a>{% endif %}</p>{% endif %}
+  {% if entry.reversal_reason %}
+  <p>{{ t.reversed }} · {{ entry.reversal_reason }} · {{ entry.reversed_at.isoformat(timespec='minutes') }}</p>
+  {% else %}
+  <details><summary>{{ t.reverse }} #{{ entry.id }}</summary>
+    <form action="/finance/{{ title.id }}/reverse/{{ entry.id }}" method="post" class="mt-2">
+      <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="request_key" value="{{ request_key }}">
+      <label for="reason-{{ entry.id }}">{{ t.reason }}</label><input class="form-control mb-2" id="reason-{{ entry.id }}" name="reason" minlength="3" maxlength="240" required>
+      <button class="btn btn-outline-danger">{{ t.reverse }} #{{ entry.id }}</button>
+    </form>
+  </details>
+  {% endif %}
+</li>
+{% else %}<li class="list-group-item">{{ t.no_settlements }}</li>{% endfor %}
+</ul>
+{% endblock %}

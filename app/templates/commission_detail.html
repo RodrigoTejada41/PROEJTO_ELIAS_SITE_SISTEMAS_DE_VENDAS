@@ -1,0 +1,33 @@
+{% extends "dashboard.html" %}
+{% set locale_target = '/commissions/' ~ seller.id %}
+{% block title %}{{ t.commissions }} · {{ seller.username }}{% endblock %}
+{% block content %}
+<h1 class="h3">{{ t.commissions }} · {{ seller.username }}</h1>
+<p>{{ t.commission_earned }} USD {{ money(seller.earned,2,locale) }} · {{ t.commission_paid }} USD {{ money(seller.paid,2,locale) }}</p>
+<p class="h4">{{ t.commission_balance }} USD {{ money(seller.balance,2,locale) }}</p>
+{% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
+{% if seller.balance > 0 %}
+<form action="/commissions/{{ seller.id }}/payout" method="post" class="card card-body">
+  <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="request_key" value="{{ request_key }}">
+  <div class="form-group"><label for="amount">{{ t.commission_payout }} · USD</label><input class="form-control" id="amount" name="amount" inputmode="decimal" maxlength="20" required></div>
+  <div class="form-group"><label for="currency">{{ t.payment_currency }}</label><select class="form-control" id="currency" name="currency" required><option value=""></option><option value="USD">USD</option><option value="PYG">PYG</option></select></div>
+  <div class="form-group"><label for="method">{{ t.method }}</label><select class="form-control" id="method" name="method" required><option value=""></option>{% for method in ['cash','transfer','card','other'] %}<option value="{{ method }}">{{ t[method] }}</option>{% endfor %}</select></div>
+  <button class="btn btn-outline-dark">{{ t.commission_payout }}</button>
+</form>
+{% endif %}
+<h2 class="h4">{{ t.commission_earned }} · {{ t.recent_history }}</h2>
+<ul class="list-group mb-3">
+{% for entry in accruals %}
+<li class="list-group-item text-break">
+  <a href="/sales/{{ entry.sale_id }}">{{ t.sale }} #{{ entry.sale_id }}</a> · {{ entry.percent }}%
+  <p>{{ t.commission_base }} USD {{ money(entry.base_minor,2,locale) }} · {{ t.amount }} USD {{ money(entry.amount_minor,2,locale) }}{% if entry.reversed %} · {{ t.reversed }}{% endif %}</p>
+</li>
+{% else %}<li class="list-group-item">{{ t.no_events }}</li>{% endfor %}
+</ul>
+<h2 class="h4">{{ t.commission_paid }} · {{ t.recent_history }}</h2>
+<ul class="list-group">
+{% for entry in payouts %}
+<li class="list-group-item text-break"><a href="/finance/{{ entry.title_id }}">{{ t.finance }} #{{ entry.title_id }}</a> · USD {{ money(entry.amount_minor,2,locale) }}{% if entry.reversed %} · {{ t.reversed }}{% endif %}</li>
+{% else %}<li class="list-group-item">{{ t.no_events }}</li>{% endfor %}
+</ul>
+{% endblock %}

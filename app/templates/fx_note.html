@@ -1,0 +1,8 @@
+{% if quote %}
+<div class="mt-4 pt-3 border-top small text-break">
+  <p class="mb-1">{{ t.fx }} · 1 USD = {{ quote.pyg_per_usd }} PYG · {{ t.fx_published }} {{ quote.published_at.isoformat(timespec='minutes') }}</p>
+  {% if quote.source == 'bcp' %}<a href="https://www.bcp.gov.py/webapps/web/cotizacion/monedas" target="_blank" rel="noopener noreferrer">Banco Central del Paraguay</a>{% elif quote.source == 'exchangerate_api' %}
+  <a href="https://www.exchangerate-api.com" target="_blank" rel="noopener noreferrer">Rates By ExchangeRate-API</a>
+  {% else %}<p class="mb-0">{{ t.fx_manual }}</p>{% endif %}
+</div>
+{% endif %}

@@ -1,0 +1,52 @@
+{% extends "dashboard.html" %}
+{% set locale_target = '/stock/import' %}
+{% block title %}{{ t.stock_batch }}{% endblock %}
+{% block content %}
+<p><a href="/stock">{{ t.stock }}</a></p>
+<h1>{{ t.stock_batch }}</h1>
+{% if error %}<p class="alert alert-danger" role="alert">{% if line %}{{ t.import_line }} {{ line }}. {% endif %}{{ t[error] }}</p>{% endif %}
+{% if rows %}
+{% if saved %}
+<p class="alert alert-success" role="status">{{ t.stock_batch_saved }} {{ rows|length }}</p>
+<p><a href="/stock/import">{{ t.stock_batch }}</a></p>
+{% else %}
+<p>{{ t.reason }}: {{ reason }}</p>
+<form action="/stock/import/confirm" method="post" class="mb-3">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <input type="hidden" name="payload" value="{{ payload }}">
+  <input type="hidden" name="signature" value="{{ signature }}">
+  <input type="hidden" name="reason" value="{{ reason }}">
+  <button class="btn btn-primary" type="submit">{{ t.stock_batch_confirm }}</button>
+  <a class="btn btn-outline-dark" href="/stock/import">{{ t.cancel }}</a>
+</form>
+{% endif %}
+<div class="table-responsive">
+  <table class="table table-sm table-striped">
+    <thead><tr><th scope="col">{{ t.code }}</th><th scope="col">{{ t.description }}</th>
+      <th scope="col">{{ t.balance }}</th><th scope="col">{{ t.stock_batch_amount }}</th>
+      <th scope="col">{{ t.stock_batch_result if saved else t.stock_batch_projected }}</th></tr></thead>
+    <tbody>
+    {% for row in rows %}
+    <tr><th scope="row">{{ row.code }}</th><td>{{ row.description }}</td><td>{{ row.balance }}</td>
+      <td>{{ row.amount }}</td><td class="{{ 'text-danger' if row.updated < 0 else '' }}">{{ row.updated }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p>{{ t.stock_batch_help }} {{ t.stock_batch_once }}</p>
+<form action="/stock/import/export" method="get" class="mb-4">
+  <div class="form-group"><label for="stock-export-page">{{ t.workbook_batch }}</label>
+    <input class="form-control col-sm-3" type="number" name="page" id="stock-export-page" min="1" max="1000000" value="1" required></div>
+  <button class="btn btn-outline-dark" type="submit">{{ t.stock_batch_download }}</button>
+</form>
+<form action="/stock/import" method="post" enctype="multipart/form-data">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <div class="form-group"><label for="stock-reason">{{ t.reason }}</label>
+    <input class="form-control" name="reason" id="stock-reason" minlength="3" maxlength="240" value="{{ reason or '' }}" required></div>
+  <div class="form-group"><label for="stock-file">{{ t.workbook_file }}</label>
+    <input class="form-control-file" type="file" name="file" id="stock-file" accept=".xlsx" required></div>
+  <button class="btn btn-primary" type="submit">{{ t.workbook_preview }}</button>
+</form>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "dashboard.html" %}
+{% block title %}{{ t.sales_report }}{% endblock %}
+{% block content %}
+<h1>{{ t.sales_report }}</h1>
+{% include "report_nav.html" %}
+{% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
+<form method="get" action="/reports/sales" class="mb-3">
+  {% include "report_dates.html" %}
+  <button class="btn btn-outline-dark">{{ t.filter }}</button><button class="btn btn-outline-dark" name="export" value="true">{{ t.export_csv }}</button>
+</form>
+<p>{{ t.sales }} {{ total.count }} · {{ t.total }} <strong>USD {{ money(total.net_minor,2,locale) }}</strong> · PYG {{ money(total.pyg,0,locale) }}</p>
+{% if total.missing_rate %}<p class="small">{{ t.report_missing_rate }}</p>{% endif %}
+<ul class="list-group mb-3">
+{% for row in rows %}<li class="list-group-item text-break">
+  <a href="/sales/{{ row.id }}">{{ t.sale }} #{{ row.id }}</a> · {{ row.seller_name }} · {{ row.customer_name or '' }}
+  <p>USD {{ money(row.net_minor,2,locale) }}{% if row.pyg_per_usd %} · PYG {{ money(convert(row.net_minor,'USD','PYG',row.pyg_per_usd),0,locale) }}{% endif %} · {{ row.confirmed_at.isoformat(timespec='minutes') }}</p>
+  {% if row.pyg_per_usd %}<p class="small">{{ t.fx }} {{ row.pyg_per_usd }}{% if row.rate_source == 'bcp' %}<a href="https://www.bcp.gov.py/webapps/web/cotizacion/monedas" target="_blank" rel="noopener noreferrer">Banco Central del Paraguay</a>{% elif row.rate_source == 'exchangerate_api' %} · <a href="https://www.exchangerate-api.com" target="_blank" rel="noopener noreferrer">Rates By ExchangeRate-API</a>{% endif %}</p>{% endif %}
+</li>
+{% else %}<li class="list-group-item">{{ t.no_sales }}</li>{% endfor %}
+</ul>
+<nav class="mb-3">
+{% if page > 1 %}<a class="btn btn-outline-dark" href="?page={{ page - 1 }}&amp;start={{ start }}&amp;end={{ end }}{% if seller_id %}&amp;seller_id={{ seller_id }}{% endif %}">{{ t.previous_page }}</a>{% endif %}
+{% if has_next %}<a class="btn btn-outline-dark" href="?page={{ page + 1 }}&amp;start={{ start }}&amp;end={{ end }}{% if seller_id %}&amp;seller_id={{ seller_id }}{% endif %}">{{ t.next_page }}</a>{% endif %}
+</nav>
+<h2 class="h4">{{ t.top_products }}</h2>
+<ul class="list-group">{% for product in top_products %}<li class="list-group-item">{{ product.code_snapshot }} · {{ product.quantity }}</li>{% endfor %}</ul>
+{% endblock %}

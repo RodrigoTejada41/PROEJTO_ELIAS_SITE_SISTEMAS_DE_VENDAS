@@ -1,0 +1,42 @@
+{% extends "dashboard.html" %}
+{% block title %}{{ t.reports }}{% endblock %}
+{% block content %}
+<h1>{{ t.reports }} · {{ t.stock }}</h1>
+{% include "report_nav.html" %}
+{% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
+<form method="get" action="/reports" class="mb-3">
+  <div class="form-group"><label for="q">{{ t.search }}</label><input class="form-control" id="q" name="q" maxlength="160" value="{{ query }}"></div>
+  {% if is_master %}
+  <div class="form-group">
+    <label for="status">{{ t.status }}</label>
+    <select class="form-control" name="status" id="status">
+    {% for value, label in [('active','active'), ('inactive','inactive'), ('all','all')] %}
+      <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ t[label] }}</option>
+    {% endfor %}
+    </select>
+  </div>
+  {% endif %}
+  <div class="form-group">
+    <label for="balance">{{ t.report_balance }}</label>
+    <select class="form-control" id="balance" name="balance">
+      {% for value in ('all', 'positive', 'zero', 'negative') %}
+      <option value="{{ value }}" {% if balance == value %}selected{% endif %}>{{ t.all if value == 'all' else t['balance_' ~ value] }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button class="btn btn-outline-dark" type="submit">{{ t.filter }}</button>
+  <button class="btn btn-outline-dark" type="submit" name="export" value="true">{{ t.export_csv }}</button>
+</form>
+<p>{{ t.filtered_skus }} <strong>{{ totals.skus }}</strong> · {{ t.stock_units }} <strong>{{ totals.units }}</strong></p>
+<ul class="list-group mb-3">
+{% for row in rows %}
+  <li class="list-group-item text-break">{{ row.code }} · {{ row.description }} · {{ t.balance }} <strong>{{ row.balance }}</strong> · {{ t.active if row.active else t.inactive }}</li>
+{% else %}
+  <li class="list-group-item">{{ t.no_skus }}</li>
+{% endfor %}
+</ul>
+<nav>
+{% if page > 1 %}<a class="btn btn-outline-dark" href="?page={{ page - 1 }}&amp;q={{ query|urlencode }}&amp;status={{ selected_status }}&amp;balance={{ balance }}">{{ t.previous_page }}</a>{% endif %}
+{% if has_next %}<a class="btn btn-outline-dark" href="?page={{ page + 1 }}&amp;q={{ query|urlencode }}&amp;status={{ selected_status }}&amp;balance={{ balance }}">{{ t.next_page }}</a>{% endif %}
+</nav>
+{% endblock %}

@@ -1,0 +1,67 @@
+name: esther-beauty
+
+x-app: &app
+  image: esther-beauty-app:local
+  build: .
+  environment:
+    PGHOST: db
+    PGPORT: "5432"
+    PGDATABASE: esther_beauty
+    PGUSER: esther
+    PGPASSWORD_FILE: /run/secrets/db_password
+  secrets:
+    - db_password
+
+services:
+  db:
+    image: postgres:18-bookworm
+    environment:
+      POSTGRES_DB: esther_beauty
+      POSTGRES_USER: esther
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U esther -d esther_beauty"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  migrate:
+    <<: *app
+    command: ["python", "-m", "app.migrate"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    <<: *app
+    ports:
+      - "127.0.0.1:${APP_PORT:-8765}:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/login', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  fx_worker:
+    <<: *app
+    command: ["python", "-m", "app.fx_worker"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+secrets:
+  db_password:
+    file: ./.local/db_password

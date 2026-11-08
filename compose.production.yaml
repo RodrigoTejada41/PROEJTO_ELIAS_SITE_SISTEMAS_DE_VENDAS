@@ -1,0 +1,42 @@
+name: esther-beauty-production
+
+services:
+  db:
+    secrets: !override [production_admin]
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/production_admin
+
+  migrate:
+    secrets: !override [production_migrate]
+    environment:
+      PGUSER: esther_migrate
+      PGPASSWORD_FILE: /run/secrets/production_migrate
+      ESTHER_PRODUCTION_GRANTS: "1"
+
+  app:
+    secrets: !override [production_app, production_mfa]
+    environment:
+      PGUSER: esther_app
+      PGPASSWORD_FILE: /run/secrets/production_app
+      ESTHER_PROXY_IP: ${ESTHER_PROXY_IP:?Defina o IP do proxy visto pelo Uvicorn}
+      ESTHER_MFA_REQUIRED: "1"
+      ESTHER_MFA_KEY_FILE: /run/secrets/production_mfa
+    command: ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+
+  fx_worker:
+    secrets: !override [production_fx]
+    environment:
+      PGUSER: esther_fx
+      PGPASSWORD_FILE: /run/secrets/production_fx
+
+secrets:
+  production_admin:
+    file: ./.local/production/admin
+  production_migrate:
+    file: ./.local/production/migrate
+  production_app:
+    file: ./.local/production/app
+  production_fx:
+    file: ./.local/production/fx
+  production_mfa:
+    file: ./.local/production/mfa_key

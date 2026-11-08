@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="{{ locale }}">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ t.login }} | Esther Beauty 777</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='vendor/adminlte.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='theme.css') }}">
+</head>
+<body class="login-page esther-login">
+  <main class="login-box">
+    <div class="card esther-login-card">
+      <header class="esther-login-brand">
+        <img class="brand-logo" src="{{ url_for('static', path='esther-beauty-777.jpeg') }}"
+             alt="" width="1254" height="1254">
+        <h1>Esther Beauty <span>777</span></h1>
+      </header>
+      <div class="card-body">
+        <nav aria-label="{{ t.language }}" class="esther-login-languages mb-3">
+          <a href="?lang=pt" lang="pt" {% if locale == 'pt' %}aria-current="true"{% endif %}>Português</a>
+          <a href="?lang=es" lang="es" {% if locale == 'es' %}aria-current="true"{% endif %}>Español</a>
+        </nav>
+        {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
+        <form action="{{ '/login/verify' if second_factor else '/login' }}" method="post">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          {% if second_factor %}
+          {% if mfa_stage == 'activate' %}
+          <div class="form-group">
+            <label for="activation">{{ t.mfa_activation }}</label>
+            <p id="activation-help">{{ t.mfa_activation_help }}</p>
+            <input class="form-control" type="password" id="activation" name="activation" maxlength="64"
+                   autocomplete="off" aria-describedby="activation-help" required>
+          </div>
+          <button class="btn btn-block esther-login-submit" type="submit">{{ t.mfa_verify }}</button>
+          {% elif mfa_stage in ('verify', 'setup') %}
+          {% if mfa_setup %}
+          <p>{{ t.mfa_scan }}</p>
+          <img class="img-fluid d-block mx-auto mb-2" width="240" height="240"
+               src="{{ mfa_setup[1] }}" alt="{{ t.mfa_qr }}">
+          <details class="mb-3">
+            <summary>{{ t.mfa_manual }}</summary>
+            <code class="text-break">{{ mfa_setup[0] }}</code>
+          </details>
+          {% endif %}
+          <div class="form-group">
+            <label for="code">{{ t.mfa_code }}</label>
+            <input class="form-control" id="code" name="code" inputmode="numeric" pattern="[0-9]{6}"
+                   maxlength="6" autocomplete="one-time-code" required>
+          </div>
+          <button class="btn btn-block esther-login-submit" type="submit">{{ t.mfa_verify }}</button>
+          {% endif %}
+          <a class="d-block mt-3" href="/login">{{ t.mfa_back }}</a>
+          {% else %}
+          <div class="form-group">
+            <label for="username">{{ t.username }}</label>
+            <input class="form-control" id="username" name="username" maxlength="64" autocomplete="username" required>
+          </div>
+          <div class="form-group">
+            <label for="password">{{ t.password }}</label>
+            <input class="form-control" type="password" id="password" name="password" maxlength="128" autocomplete="current-password" required>
+          </div>
+          <button class="btn btn-block esther-login-submit" type="submit">{{ t.login }}</button>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

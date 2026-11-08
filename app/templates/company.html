@@ -1,0 +1,17 @@
+{% extends "dashboard.html" %}
+{% block title %}{{ t.company }}{% endblock %}
+{% block content %}
+<h1>{{ t.company }}</h1>
+{% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
+<form action="/settings/company" method="post" class="card card-body">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  {% for key, limit in fields.items() %}
+  <div class="form-group">
+    <label for="{{ key }}">{{ t[key] }}</label>
+    <input class="form-control" id="{{ key }}" name="{{ key }}" maxlength="{{ limit }}"
+           value="{{ company.get(key, '') }}" {% if key == 'name' %}required{% endif %}>
+  </div>
+  {% endfor %}
+  <button class="btn btn-outline-dark">{{ t.company_save }}</button>
+</form>
+{% endblock %}

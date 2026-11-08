@@ -1,0 +1,24 @@
+{% extends "dashboard.html" %}
+{% block title %}{{ t.maintenance }}{% endblock %}
+{% block content %}
+<h1>{{ t.maintenance }}</h1>
+{% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
+{% if request.query_params.get('updated') == '1' %}
+<p class="alert alert-success" role="status">{{ t.master_reset_done }}</p>
+{% endif %}
+<form action="/maintenance" method="post" class="card card-body">
+  <h2 class="h5">{{ t.master_reset }}</h2>
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <div class="form-group">
+    <label for="dev_password">{{ t.dev_password }}</label>
+    <input class="form-control" id="dev_password" name="dev_password" type="password"
+           autocomplete="current-password" maxlength="128" required>
+  </div>
+  <div class="form-group">
+    <label for="password">{{ t.master_new_password }}</label>
+    <input class="form-control" id="password" name="password" type="password"
+           autocomplete="new-password" minlength="15" maxlength="128" required>
+  </div>
+  <button class="btn btn-outline-dark">{{ t.master_reset }}</button>
+</form>
+{% endblock %}

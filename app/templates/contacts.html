@@ -1,0 +1,43 @@
+{% extends "dashboard.html" %}
+{% block title %}{{ t[kind] }}{% endblock %}
+{% block content %}
+<h1>{{ t[kind] }}</h1>
+<form method="get" action="/contacts/{{ kind }}" class="mb-3">
+  <label for="q">{{ t.search_contact }}</label>
+  <div class="input-group">
+    <input class="form-control" id="q" name="q" maxlength="160" value="{{ query }}">
+    <div class="input-group-append"><button class="btn btn-outline-dark">{{ t.search_button }}</button></div>
+  </div>
+</form>
+{% if is_master %}<a class="btn btn-outline-dark mb-3" href="/contacts/{{ kind }}/new">{{ t.new_contact }}</a>{% endif %}
+<ul class="list-group mb-3">
+{% for party in parties %}
+  <li class="list-group-item text-break">
+    <h2 class="h5">#{{ party.id }} · {{ party.name }}</h2>
+    <p>{{ party.external_ref or '' }} · {{ t.active if party.active else t.inactive }}</p>
+    {% for field in ('contact', 'phone', 'email') if party[field] %}
+    <p>{{ t[field] }} · {{ party[field] }}</p>
+    {% endfor %}
+    {% if is_master %}
+    <a class="btn btn-sm btn-outline-dark" href="/contacts/{{ kind }}/{{ party.id }}/edit"
+       aria-label="{{ t.edit_sku }} {{ party.name }}">{{ t.edit_sku }}</a>
+    {% if party.active %}
+    <details class="mt-2">
+      <summary>{{ t.deactivate }} {{ party.name }}</summary>
+      <form action="/contacts/{{ kind }}/{{ party.id }}/deactivate" method="post" class="mt-2">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <button class="btn btn-sm btn-outline-danger">{{ t.confirm_deactivate }}</button>
+      </form>
+    </details>
+    {% endif %}
+    {% endif %}
+  </li>
+{% else %}
+  <li class="list-group-item">{{ t.no_contacts }}</li>
+{% endfor %}
+</ul>
+<nav>
+{% if page > 1 %}<a class="btn btn-outline-dark" href="?page={{ page - 1 }}&amp;q={{ query|urlencode }}">{{ t.previous_page }}</a>{% endif %}
+{% if has_next %}<a class="btn btn-outline-dark" href="?page={{ page + 1 }}&amp;q={{ query|urlencode }}">{{ t.next_page }}</a>{% endif %}
+</nav>
+{% endblock %}

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="{{ locale }}">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ t.dashboard }}{% endblock %} | Esther Beauty 777</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='vendor/adminlte.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='theme.css') }}">
+  <script defer src="{{ url_for('static', path='menu.js') }}"></script>
+</head>
+<body>
+  <a class="sr-only sr-only-focusable" href="#content">{{ t.skip }}</a>
+  <header class="navbar navbar-light brand-header">
+    <button id="menu-toggle" type="button" class="btn btn-outline-dark"
+            aria-controls="navigation" aria-expanded="true">{{ t.menu }}</button>
+    <nav aria-label="{{ t.language }}" class="d-flex">
+      {% for code, label in [('pt','Português'), ('es','Español')] %}
+      <form action="/preferences/locale" method="post" class="mx-1">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input type="hidden" name="locale" value="{{ code }}">
+        <input type="hidden" name="next" value="{{ locale_target|default(request.url.path) }}">
+        <button class="btn btn-sm btn-outline-dark" lang="{{ code }}" {% if locale == code %}aria-current="true"{% endif %}>{{ label }}</button>
+      </form>
+      {% endfor %}
+    </nav>
+    <form action="/logout" method="post">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <button class="btn btn-sm btn-outline-dark" type="submit">{{ t.logout }}</button>
+    </form>
+  </header>
+  <div class="workspace">
+    <aside id="navigation" class="brand-panel p-3">
+      <img class="brand-logo" src="{{ url_for('static', path='esther-beauty-777.jpeg') }}" alt="Esther Beauty 777" width="1254" height="1254">
+      <nav class="brand-navigation" aria-label="{{ 'Navegación principal' if locale == 'es' else 'Navegação principal' }}">
+        <a class="nav-link brand-link" href="/" {% if not managing_operators and not in_catalog and not in_stock and not section %}aria-current="page"{% endif %}>{{ t.dashboard }}</a>
+        <a class="nav-link brand-link" href="/catalog" {% if in_catalog %}aria-current="page"{% endif %}>{{ t.catalog }}</a>
+        <a class="nav-link brand-link" href="/pricing" {% if section == 'pricing' %}aria-current="page"{% endif %}>{{ t.pricing if is_master else t.prices }}</a>
+        <a class="nav-link brand-link" href="/stock" {% if in_stock %}aria-current="page"{% endif %}>{{ t.stock }}</a>
+        <a class="nav-link brand-link" href="/contacts/customers" {% if section == 'customers' %}aria-current="page"{% endif %}>{{ t.customers }}</a>
+        <a class="nav-link brand-link" href="/reports" {% if section == 'reports' %}aria-current="page"{% endif %}>{{ t.reports }}</a>
+        {% if is_master %}
+        <a class="nav-link brand-link" href="/settings/company" {% if section == 'company' %}aria-current="page"{% endif %}>{{ t.company }}</a>
+        {% if request.state.role == 'DEV' %}
+        <a class="nav-link brand-link" href="/maintenance" {% if section == 'maintenance' %}aria-current="page"{% endif %}>{{ t.maintenance }}</a>
+        {% endif %}
+        <a class="nav-link brand-link" href="/sales" {% if section == 'sales' %}aria-current="page"{% endif %}>{{ t.sales }}</a>
+        <a class="nav-link brand-link" href="/commissions" {% if section == 'commissions' %}aria-current="page"{% endif %}>{{ t.commissions }}</a>
+        <a class="nav-link brand-link" href="/finance" {% if section == 'finance' %}aria-current="page"{% endif %}>{{ t.finance }}</a>
+        <a class="nav-link brand-link" href="/audit" {% if section == 'audit' %}aria-current="page"{% endif %}>{{ t.audit }}</a>
+        <a class="nav-link brand-link" href="/contacts/suppliers" {% if section == 'suppliers' %}aria-current="page"{% endif %}>{{ t.suppliers }}</a>
+        <a class="nav-link brand-link" href="/operators" {% if managing_operators %}aria-current="page"{% endif %}>{{ t.operators }}</a>
+        {% endif %}
+      </nav>
+    </aside>
+    <main id="content" class="container-fluid p-3 p-md-4" tabindex="-1">
+      {% block content %}
+      <h1>{{ t.dashboard }}</h1>
+      <p>{{ t.notice }}</p>
+      <div class="row">
+        {% for label, count in cards %}
+          <section class="col-sm-6">
+            <div class="card card-outline summary-card">
+              <div class="card-body">
+                <h2 class="h5">{{ t[label] }}</h2>
+                <p class="h3 mb-0">{{ count }}</p>
+              </div>
+            </div>
+          </section>
+        {% endfor %}
+      </div>
+      {% if is_master %}{% include "sales_dashboard.html" %}{% endif %}
+      {% endblock %}
+      {% if quote %}{% include "fx_note.html" %}{% endif %}
+    </main>
+  </div>
+</body>
+</html>

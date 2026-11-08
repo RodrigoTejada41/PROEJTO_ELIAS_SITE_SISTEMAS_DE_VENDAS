@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="{{ locale }}">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="data:,">
+  <title>{{ t[error_key] }} | Esther Beauty 777</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='vendor/adminlte.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='theme.css') }}">
+</head>
+<body class="login-page esther-login">
+<main class="login-box">
+  <div class="card esther-login-card">
+    <header class="esther-login-brand"><img class="brand-logo" src="{{ url_for('static', path='esther-beauty-777.jpeg') }}" alt="" width="1254" height="1254"><h1>Esther Beauty <span>777</span></h1></header>
+    <div class="card-body"><h2 class="h5">{{ t[error_key] }}</h2><a class="btn btn-outline-dark" href="/">{{ t.back }}</a></div>
+  </div>
+</main>
+</body>
+</html>

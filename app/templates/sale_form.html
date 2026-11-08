@@ -1,0 +1,64 @@
+{% extends "dashboard.html" %}
+{% set locale_target = '/sales/' ~ sale.id if sale else '/sales/new' %}
+{% block title %}{{ t.sale ~ ' #' ~ sale.id if sale else t.new_sale }}{% endblock %}
+{% block content %}
+<p><a href="/sales">{{ t.sales }}</a></p>
+<h1>{{ t.sale ~ ' #' ~ sale.id if sale else t.new_sale }}</h1>
+{% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
+{% if error == 'sale_version' and sale %}<p><a href="/sales/{{ sale.id }}">{{ t.sale_reload }}</a></p>{% endif %}
+<noscript><p class="alert alert-warning">{{ t.sale_js }}</p></noscript>
+<form id="sale-cart" method="post" action="{{ '/sales/' ~ sale.id ~ '/draft' if sale else '/sales/new' }}"
+      data-rate="{{ rate }}" data-labels="{{ t|tojson|forceescape }}">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  {% if sale %}<input type="hidden" name="version" value="{{ form.get('version', '') }}">
+  {% else %}<input type="hidden" name="request_key" value="{{ form.get('request_key', '') }}">{% endif %}
+  <input type="hidden" name="cart" id="cart-data" value="{{ cart|tojson|forceescape }}">
+  <div class="card card-body">
+    <div class="row">
+      <div class="form-group col-md-6">
+        <label for="customer_id">{{ t.sale_customer_label }}</label>
+        <select class="form-control" id="customer_id" name="customer_id">
+          <option value="">{{ t.sale_no_customer }}</option>
+          {% for customer in customers %}<option value="{{ customer.id }}" {% if form.get('customer_id') == customer.id|string %}selected{% endif %}>{{ customer.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="seller_id">{{ t.seller }}</label>
+        <select class="form-control" id="seller_id" name="seller_id" required>
+          <option value="">{{ t.sale_choose_seller }}</option>
+          {% for seller in sellers %}<option value="{{ seller.id }}" {% if form.get('seller_id') == seller.id|string %}selected{% endif %}>{{ seller.username }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-group col-md-6"><label for="due_date">{{ t.due_date }}</label><input class="form-control" id="due_date" name="due_date" type="date" value="{{ form.get('due_date', '') }}" required></div>
+      <div class="form-group col-md-6"><label for="discount">{{ t.discount }}</label><input class="form-control" id="discount" name="discount" inputmode="decimal" maxlength="20" value="{{ form.get('discount', '0') }}" required></div>
+    </div>
+  </div>
+  <section class="card card-body">
+    <h2 class="h5">{{ t.sale_products }}</h2>
+    <div class="form-group mb-2">
+      <label for="product-search">{{ t.sale_search }}</label>
+      <input class="form-control" id="product-search" type="search" maxlength="160" autocomplete="off" aria-controls="product-results">
+    </div>
+    <p class="small mb-2" id="product-status" role="status"></p>
+    <div class="list-group" id="product-results"></div>
+  </section>
+  <section class="card card-body">
+    <h2 class="h5">{{ t.receipt_items }}</h2>
+    <div id="sale-items"></div>
+    <div id="sale-totals" class="border-top pt-2 mt-2" aria-live="polite"></div>
+    <div class="d-flex flex-wrap mt-3">
+      <button class="btn btn-outline-dark mr-2 mb-2" type="submit" name="action" value="save" disabled>{{ t.sale_save_draft }}</button>
+      <button class="btn btn-primary mb-2" type="submit" name="action" value="confirm" disabled>{{ t.confirm_sale }}</button>
+    </div>
+  </section>
+</form>
+{% if sale %}
+<details><summary>{{ t.cancel }} #{{ sale.id }}</summary>
+  <form action="/sales/{{ sale.id }}/cancel" method="post" class="mt-2">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <button class="btn btn-outline-danger">{{ t.cancel }} #{{ sale.id }}</button>
+  </form>
+</details>
+{% endif %}
+<script defer src="{{ url_for('static', path='sale-cart.js') }}"></script>
+{% endblock %}

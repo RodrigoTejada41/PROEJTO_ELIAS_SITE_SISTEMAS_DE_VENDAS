@@ -1,0 +1,193 @@
+:root {
+  --esther-ivory: #fffaf5;
+  --esther-blush: #f9ded7;
+  --esther-gold: #b77a39;
+  --esther-bronze: #713e24;
+  --esther-ink: #47281d;
+}
+
+body { color: var(--esther-ink); background: var(--esther-ivory); }
+.brand-header { background: var(--esther-ivory); border-bottom: 1px solid var(--esther-gold); }
+.workspace { display: flex; min-height: calc(100vh - 60px); }
+.workspace main { min-width: 0; }
+.brand-panel {
+  flex: 0 0 16rem;
+  background: #f6eee7;
+  border-right: 1px solid #dfc6b4;
+}
+
+.brand-logo {
+  display: block;
+  width: min(100%, 11rem);
+  height: auto;
+  margin-inline: auto;
+  border-radius: 50%;
+}
+
+.brand-panel .brand-logo {
+  width: 7.5rem;
+  border: 2px solid var(--esther-ivory);
+  box-shadow: 0 0 0 1px var(--esther-gold);
+}
+
+.brand-navigation {
+  display: grid;
+  gap: .5rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dfc6b4;
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: .55rem .85rem;
+  color: var(--esther-ink);
+  background: var(--esther-ivory);
+  border: 1px solid #ba9782;
+  border-radius: .55rem;
+  font-size: .925rem;
+  font-weight: 600;
+}
+
+.brand-link:hover {
+  color: var(--esther-ink);
+  background: var(--esther-blush);
+  border-color: var(--esther-bronze);
+}
+
+.brand-link[aria-current="page"] {
+  color: var(--esther-ivory);
+  background: var(--esther-bronze);
+  border-color: var(--esther-bronze);
+}
+
+.brand-header .btn-outline-dark,
+.workspace .btn-outline-dark { color: var(--esther-ink); border-color: var(--esther-bronze); }
+.brand-header .btn-outline-dark:hover,
+.workspace .btn-outline-dark:hover,
+.brand-header [aria-current="true"] { color: #fff; background: var(--esther-bronze); }
+.workspace .btn-primary {
+  background: var(--esther-bronze);
+  border-color: var(--esther-bronze);
+}
+.workspace .btn-primary:hover { background: var(--esther-ink); border-color: var(--esther-ink); }
+.workspace .form-control:focus { border-color: var(--esther-bronze); box-shadow: none; }
+.workspace .form-control:focus-visible,
+.workspace .btn:focus-visible { outline: 3px solid var(--esther-bronze); outline-offset: 3px; }
+.summary-card { border: 1px solid #dfc6b4; border-top: 3px solid var(--esther-gold); }
+:focus-visible { outline: 3px solid var(--esther-bronze); outline-offset: 3px; }
+.brand-header .btn:focus-visible { outline: 3px solid var(--esther-bronze); outline-offset: 3px; }
+
+@media (max-width: 575px) {
+  .workspace { display: block; }
+  .brand-panel { border-right: 0; border-bottom: 1px solid #dfc6b4; }
+  .brand-panel .brand-logo { width: 5.5rem; }
+  .navbar { gap: .5rem; }
+}
+
+.esther-login {
+  height: auto;
+  min-height: 100vh;
+  padding: clamp(1rem, 4vw, 2rem);
+  background: radial-gradient(ellipse at top, var(--esther-blush), var(--esther-ivory) 70%);
+}
+
+.esther-login .login-box {
+  width: min(100%, 26rem);
+  margin: 0;
+}
+
+.esther-login-card {
+  overflow: hidden;
+  margin: 0;
+  background: var(--esther-ivory);
+  border: 1px solid var(--esther-gold);
+  border-radius: 1.25rem;
+  box-shadow: 0 18px 48px rgb(71 40 29 / 14%);
+}
+
+.esther-login-brand {
+  padding: 1.5rem 1rem 1.25rem;
+  text-align: center;
+  background: var(--esther-blush);
+  border-bottom: 1px solid var(--esther-gold);
+}
+
+.esther-login-brand .brand-logo {
+  width: 6rem;
+  border: 2px solid var(--esther-ivory);
+  box-shadow: 0 0 0 1px var(--esther-gold);
+}
+
+.esther-login-brand h1 {
+  margin: .85rem 0 0;
+  font: 500 clamp(1.65rem, 5.6vw, 2.25rem)/1.12 Georgia, serif;
+}
+
+.esther-login-brand h1 span {
+  display: block;
+  margin-top: .4rem;
+  padding-left: .32em;
+  color: var(--esther-bronze);
+  font: 700 .7rem/1.4 system-ui, sans-serif;
+  letter-spacing: .32em;
+}
+
+.esther-login .card-body { padding: 1.35rem clamp(1rem, 5vw, 2rem) 1.6rem; }
+
+.esther-login-languages {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .35rem;
+}
+
+.esther-login-languages a {
+  color: var(--esther-bronze);
+  padding: .4rem .8rem;
+  border: 1px solid transparent;
+  border-radius: 2rem;
+  font-size: .875rem;
+  font-weight: 600;
+}
+
+.esther-login-languages a:hover { text-decoration: underline; }
+.esther-login-languages [aria-current="true"] {
+  background: var(--esther-blush);
+  border-color: var(--esther-gold);
+}
+
+.esther-login label { font-size: .9rem; }
+.esther-login .form-control {
+  min-height: 2.75rem;
+  color: var(--esther-ink);
+  border-color: var(--esther-gold);
+  border-radius: .5rem;
+}
+
+.esther-login .form-control:focus {
+  border-color: var(--esther-bronze);
+  box-shadow: none;
+}
+
+.esther-login .form-control:focus-visible,
+.esther-login .esther-login-submit:focus-visible {
+  outline: 3px solid var(--esther-bronze);
+  outline-offset: 3px;
+}
+
+.esther-login-submit {
+  min-height: 2.8rem;
+  color: var(--esther-ivory);
+  background: var(--esther-bronze);
+  border-radius: .5rem;
+  font-weight: 700;
+  letter-spacing: .025em;
+}
+
+.esther-login-submit:hover {
+  color: var(--esther-ivory);
+  background: var(--esther-ink);
+}

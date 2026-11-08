@@ -1,0 +1,19 @@
+<div class="row">
+  <div class="form-group col-sm">
+    <label for="start">{{ t.start_date }}</label>
+    <input class="form-control" type="date" id="start" name="start" value="{{ start }}">
+  </div>
+  <div class="form-group col-sm">
+    <label for="end">{{ t.end_date }}</label>
+    <input class="form-control" type="date" id="end" name="end" value="{{ end }}">
+  </div>
+  {% if sellers is defined %}
+  <div class="form-group col-sm">
+    <label for="seller_id">{{ t.seller }}</label>
+    <select class="form-control" id="seller_id" name="seller_id">
+      <option value="">{{ t.all }}</option>
+      {% for seller in sellers %}<option value="{{ seller.id }}" {% if seller_id == seller.id %}selected{% endif %}>{{ seller.username }}</option>{% endfor %}
+    </select>
+  </div>
+  {% endif %}
+</div>

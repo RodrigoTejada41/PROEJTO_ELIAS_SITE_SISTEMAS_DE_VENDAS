@@ -1,0 +1,55 @@
+<section class="mt-4" aria-labelledby="sales-dashboard-heading">
+  <h2 class="h4" id="sales-dashboard-heading">{{ t.sales_dashboard }}</h2>
+  <a class="btn btn-outline-dark btn-sm mb-3" href="/sales/new">{{ t.new_sale }}</a>
+  {% include "report_nav.html" %}
+  <form method="get" action="/" class="mb-3">
+    {% include "report_dates.html" %}
+    <button class="btn btn-outline-dark" type="submit">{{ t.filter }}</button>
+  </form>
+  {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>
+  {% elif sales_summary and sales_summary.count %}
+  <div class="row">
+    {% for label, value in [
+      ('confirmed_sales', sales_summary.count),
+      ('total', 'USD ' ~ money(sales_summary.net_minor, 2, locale)),
+      ('report_equivalent', 'PYG ' ~ money(sales_summary.pyg, 0, locale)),
+      ('average_sale', 'USD ' ~ money(sales_summary.average_minor, 2, locale))
+    ] %}
+    <div class="col-sm-6 col-xl-3">
+      <div class="card card-outline summary-card"><div class="card-body">
+        <h3 class="h6">{{ t[label] }}</h3><p class="h4 mb-0 text-break">{{ value }}</p>
+      </div></div>
+    </div>
+    {% endfor %}
+  </div>
+  {% if sales_summary.missing_rate %}<p class="small">{{ t.report_missing_rate }}</p>{% endif %}
+  <div class="row">
+    <section class="col-lg-7">
+      <div class="card card-body">
+        <h3 class="h5">{{ t.sales_trend }}</h3>
+        <ul class="list-unstyled mb-0">
+        {% for row in trend %}
+          <li class="border-top py-2">
+            <div class="d-flex flex-wrap justify-content-between">
+              <time datetime="{{ row.day.isoformat() }}">{{ row.day.strftime('%d/%m/%Y') }}</time>
+              <span>{{ row.count }} · USD {{ money(row.amount, 2, locale) }}</span>
+            </div>
+            <meter class="w-100" min="0" max="{{ trend_max }}" value="{{ row.count }}" aria-label="{{ t.confirmed_sales }} {{ row.day.isoformat() }}"></meter>
+          </li>
+        {% endfor %}
+        </ul>
+      </div>
+    </section>
+    <section class="col-lg-5">
+      <div class="card card-body">
+        <h3 class="h5">{{ t.top_products }}</h3>
+        <ol class="pl-4 mb-0">
+        {% for product in ranked %}
+          <li class="text-break mb-2">{{ product.code_snapshot }} · {{ product.description }} <strong>× {{ product.quantity }}</strong></li>
+        {% endfor %}
+        </ol>
+      </div>
+    </section>
+  </div>
+  {% else %}<p class="alert alert-info" role="status">{{ t.no_sales }}</p>{% endif %}
+</section>

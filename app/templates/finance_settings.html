@@ -1,0 +1,13 @@
+{% extends "dashboard.html" %}
+{% block title %}{{ t.finance_settings }}{% endblock %}
+{% block content %}
+<h1>{{ t.finance_settings }}</h1>
+<p>{{ t.currency_locked }}</p>
+{% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
+<form action="/finance/settings" method="post">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <div class="form-group"><label for="currency">{{ t.currency }}</label><select class="form-control" id="currency" name="currency">{% for value in ['USD','PYG'] %}<option value="{{ value }}" {% if config and config.currency == value %}selected{% endif %}>{{ value }}</option>{% endfor %}</select></div>
+  <p>USD · 2 {{ t.scale }} · PYG · 0 {{ t.scale }}</p>
+  <button class="btn btn-outline-dark">{{ t.save_sku }}</button>
+</form>
+{% endblock %}

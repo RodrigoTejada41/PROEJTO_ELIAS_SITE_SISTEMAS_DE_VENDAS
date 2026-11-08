@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="{{ locale }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ t.receipt_title }} #{{ sale.id }}</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="{{ url_for('static', path='vendor/adminlte.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='receipt.css') }}">
+  <script defer src="{{ url_for('static', path='receipt.js') }}"></script>
+</head>
+<body>
+<main class="receipt">
+  <nav class="d-print-none mb-3" aria-label="{{ t.sales }}">
+    <a class="btn btn-outline-dark" href="/sales/{{ sale.id }}">{{ t.back }}</a>
+    <button class="btn btn-outline-dark" id="receipt-print" type="button">{{ t.receipt_print }}</button>
+    <p class="small mt-2">{{ t.receipt_print_hint }}</p>
+  </nav>
+  <header class="receipt-header">
+    <div class="receipt-brand">
+      <img class="receipt-logo" src="{{ url_for('static', path='esther-beauty-777.jpeg') }}"
+           alt="" width="64" height="64">
+      <address class="receipt-issuer">
+        <strong>{{ issuer.name }}</strong>
+        {% if issuer.trade_name and issuer.trade_name != issuer.name %}<span>{{ issuer.trade_name }}</span>{% endif %}
+        {% if issuer.tax_id %}<span>{{ t.tax_id }} {{ issuer.tax_id }}</span>{% endif %}
+        {% if issuer.address %}<span>{{ issuer.address }}</span>{% endif %}
+        {% if issuer.phone %}<span>{{ t.phone }} {{ issuer.phone }}</span>{% endif %}
+      </address>
+    </div>
+    <div class="receipt-number">
+      <h1>{{ t.receipt_title }}</h1>
+      <strong>#{{ sale.id }}</strong>
+    </div>
+  </header>
+  <div class="receipt-meta">
+    <div><strong>{{ t.receipt_date }}</strong><span>{{ sale.confirmed_at.strftime('%d/%m/%Y') }}</span></div>
+    <div><strong>{{ t.receipt_customer }}</strong><span>{{ sale.customer_name or '—' }}</span></div>
+  </div>
+  <table class="receipt-items">
+    <thead><tr>
+      <th scope="col">{{ t.quantity }}</th><th scope="col">{{ t.description }}</th>
+      <th scope="col">{{ t.receipt_unit_price }}</th><th scope="col">{{ t.receipt_line_total }}</th>
+    </tr></thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.quantity }}</td>
+        <th scope="row"><small>{{ item.code_snapshot }}</small> {{ item.description_snapshot }}</th>
+        <td>{{ sale.currency }} {{ money(item.unit_minor, sale.scale, locale) }}</td>
+        <td>{{ sale.currency }} {{ money(item.quantity * item.unit_minor, sale.scale, locale) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <section class="receipt-summary" aria-label="{{ t.total }}">
+    <div>{{ t.subtotal }} <strong>{{ sale.currency }} {{ money(sale.gross, sale.scale, locale) }}</strong></div>
+    <div>{{ t.receipt_discount }} <strong>{{ sale.currency }} {{ money(sale.discount_minor, sale.scale, locale) }}</strong></div>
+    <div class="receipt-total">{{ t.total }} <strong>{{ sale.currency }} {{ money(sale.net, sale.scale, locale) }}</strong></div>
+    {% if sale.currency == 'USD' and sale.applied_rate %}
+    <div>PYG <strong>PYG {{ money(convert(sale.net, 'USD', 'PYG', sale.applied_rate), 0, locale) }}</strong></div>
+    {% endif %}
+  </section>
+  <p class="receipt-note">{{ t.receipt_note }}</p>
+</main>
+</body>
+</html>
