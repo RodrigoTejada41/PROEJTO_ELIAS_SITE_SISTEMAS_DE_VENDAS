@@ -55,10 +55,23 @@ class CurrencySalesIntegrationTest(PostgresCase):
         self.assertEqual(fx.state()["active"]["pyg_per_usd"], Decimal(7100))
         with self.isolated_connection() as connection:
             connection.execute("UPDATE fx_policy SET next_check = now() - interval '1 second'")
-        with patch("app.fx.fetch_reference", side_effect=OSError("fixture unavailable")):
-            self.assertFalse(fx.refresh())
-        self.assertEqual(fx.state()["active"]["pyg_per_usd"], Decimal(7100))
+        with patch("app.fx.fetch_reference", side_effect=OSError("fixture unavailable")), patch(
+            "app.fx.fetch_alternate", return_value=(Decimal("6900.123456"), now, now + timedelta(hours=1))
+        ):
+            self.assertTrue(fx.refresh())
+        active = fx.state()["active"]
+        self.assertEqual(active["source"], "exchangerate_api")
+        self.assertEqual(active["pyg_per_usd"], Decimal("6900.123456"))
+        with patch("app.fx.fetch_reference", side_effect=OSError("fixture unavailable")), patch(
+            "app.fx.fetch_alternate", side_effect=OSError("fixture unavailable")
+        ):
+            self.assertFalse(fx.refresh(force=True))
+        self.assertEqual(fx.state()["active"]["id"], active["id"])
         self.assertEqual(fx.state()["last_error"], "provider_unavailable")
+        with patch("app.fx.fetch_reference", return_value=(Decimal(7200), now, now + timedelta(hours=1))):
+            self.assertTrue(fx.refresh(force=True))
+        self.assertEqual(fx.state()["active"]["source"], "bcp")
+        self.assertIsNone(fx.state()["last_error"])
 
     def test_concurrent_confirmation_snapshot_and_cancellation(self):
         first, second = self.new_sale(6), self.new_sale(6)

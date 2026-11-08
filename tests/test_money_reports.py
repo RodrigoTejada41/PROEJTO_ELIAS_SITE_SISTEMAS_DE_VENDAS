@@ -12,6 +12,7 @@ from test_login_integration import request
 
 class MoneyReportIntegrationTest(PostgresCase):
     def test_cash_dates_currencies_and_sales_csv(self):
+        self.master = {**self.master, "locale": "pt"}
         fx.configure(self.actor_id, "manual", "7000", "Fixture rate")
         commissions.configure(self.actor_id, self.actor_id, "5", "received")
         catalog.create_sku(self.actor_id, "REPORT-SALE", catalog.sku_details({"description": "Report sale"}))

@@ -3,7 +3,7 @@
 {% block content %}
 <h1>{{ t.audit }}</h1>
 {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
-<form method="get" action="/audit" class="mb-3">
+<form method="get" action="{{ url_prefix }}/audit" class="mb-3">
   <div class="form-group">
     <label for="source">{{ t.source }}</label>
     <select class="form-control" id="source" name="source">

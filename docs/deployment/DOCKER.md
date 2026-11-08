@@ -71,6 +71,8 @@ Crie quatro senhas distintas no gerenciador de segredos e disponibilize-as em ar
 
 Configure `ESTHER_PROXY_IP` com o endereço único do proxy como visto pelo Uvicorn. Em Docker, confirme esse endereço a partir de uma requisição real. O proxy deve aceitar somente o domínio configurado, redirecionar HTTP para HTTPS e sobrescrever `X-Forwarded-Proto` e `X-Forwarded-For` com o esquema e o IP que ele próprio verificou. A aplicação permanece no loopback e o banco sem porta publicada.
 
+Para hospedar sob `/Sistema/`, defina `ESTHER_URL_PREFIX=/Sistema` no ambiente do Compose. Redirecione `/Sistema` para `/Sistema/` no proxy e remova o prefixo ao encaminhar ao Uvicorn. Preserve a configuração da raiz do domínio para o site principal. Valide estáticos, formulários, navegação e cookies com o prefixo ativo.
+
 Suba só o banco no primeiro provisionamento e abra o psql como administrador:
 
 ```sh

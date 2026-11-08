@@ -4,7 +4,7 @@
 <h1>{{ t.reports }} · {{ t.stock }}</h1>
 {% include "report_nav.html" %}
 {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
-<form method="get" action="/reports" class="mb-3">
+<form method="get" action="{{ url_prefix }}/reports" class="mb-3">
   <div class="form-group"><label for="q">{{ t.search }}</label><input class="form-control" id="q" name="q" maxlength="160" value="{{ query }}"></div>
   {% if is_master %}
   <div class="form-group">

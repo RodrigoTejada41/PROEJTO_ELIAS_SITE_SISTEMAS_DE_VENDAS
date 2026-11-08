@@ -2,9 +2,9 @@
 {% block title %}{{ t.finance }}{% endblock %}
 {% block content %}
 <h1>{{ t.finance }}</h1>
-<p><a href="/finance/settings">{{ t.finance_settings }}</a></p>
+<p><a href="{{ url_prefix }}/finance/settings">{{ t.finance_settings }}</a></p>
 {% if not config %}<p class="alert alert-info">{{ t.currency_required }}</p>{% endif %}
-<form method="get" action="/finance" class="mb-3">
+<form method="get" action="{{ url_prefix }}/finance" class="mb-3">
   <div class="form-group"><label for="kind">{{ t.finance }}</label>
     <select class="form-control" id="kind" name="kind">
       {% for value in ['receivable','payable'] %}<option value="{{ value }}" {% if kind == value %}selected{% endif %}>{{ t[value] }}</option>{% endfor %}
@@ -17,11 +17,11 @@
   </div>
   <button class="btn btn-outline-dark">{{ t.filter }}</button>
 </form>
-{% if config %}<a class="btn btn-outline-dark mb-3" href="/finance/new/{{ kind }}">{{ t.new_title }}</a>{% endif %}
+{% if config %}<a class="btn btn-outline-dark mb-3" href="{{ url_prefix }}/finance/new/{{ kind }}">{{ t.new_title }}</a>{% endif %}
 <ul class="list-group mb-3">
 {% for title in titles %}
 <li class="list-group-item text-break">
-  <h2 class="h5"><a href="/finance/{{ title.id }}">#{{ title.id }} · {{ title.description }}</a></h2>
+  <h2 class="h5"><a href="{{ url_prefix }}/finance/{{ title.id }}">#{{ title.id }} · {{ title.description }}</a></h2>
   <p>{{ t.amount }} {{ title.currency }} {{ money(title.amount_minor, title.scale, locale) }}</p>
   <p>{{ t.remaining }} {{ title.currency }} {{ money(0 if title.canceled else title.amount_minor - title.paid, title.scale, locale) }}</p>
   <p class="mb-0">{{ t.due_date }} {{ title.due_date.strftime('%d/%m/%Y') }} · {{ t.canceled if title.canceled else t.paid if title.amount_minor == title.paid else t.open }}{% if title.overdue %} · <strong>{{ t.overdue }}</strong>{% endif %}</p>

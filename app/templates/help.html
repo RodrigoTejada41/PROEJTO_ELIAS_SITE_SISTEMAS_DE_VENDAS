@@ -1,0 +1,31 @@
+<dialog id="help-manual" class="help-manual" aria-labelledby="help-heading">
+  <div class="help-heading">
+    <h2 id="help-heading" class="h4 mb-0">{{ t.help_title }}</h2>
+    <form method="dialog"><button type="submit" class="btn btn-sm btn-outline-dark" autofocus>{{ t.help_close }}</button></form>
+  </div>
+  <p>{{ t.help_intro }}</p>
+  {% for key, path, title, steps in help_topics %}
+  <details class="help-topic" data-guide="{{ key }}" data-path="{{ url_prefix }}{{ path }}">
+    <summary>{{ title }}</summary>
+    <ol>
+      {% for target, instruction in steps %}
+      <li{% if target %} data-target="{{ target }}"{% endif %}>{{ instruction }}</li>
+      {% endfor %}
+    </ol>
+    <a class="btn btn-sm btn-outline-dark" href="{{ url_prefix }}{{ path }}#guia-{{ key }}">{{ t.help_start }}</a>
+  </details>
+  {% endfor %}
+</dialog>
+<section id="help-tour" class="help-tour" aria-labelledby="help-tour-title" hidden
+         data-step="{{ t.help_step }}" data-next="{{ t.help_next }}" data-finish="{{ t.help_finish }}">
+  <div aria-live="polite">
+    <p id="help-progress" class="small mb-1"></p>
+    <h2 id="help-tour-title" class="h5" tabindex="-1"></h2>
+    <p id="help-instruction"></p>
+  </div>
+  <div class="help-actions">
+    <button type="button" id="help-previous" class="btn btn-sm btn-outline-dark">{{ t.help_previous }}</button>
+    <button type="button" id="help-next" class="btn btn-sm btn-dark">{{ t.help_next }}</button>
+    <button type="button" id="help-close" class="btn btn-sm btn-outline-dark">{{ t.help_close }}</button>
+  </div>
+</section>

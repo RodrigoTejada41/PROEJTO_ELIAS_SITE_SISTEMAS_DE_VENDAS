@@ -1,4 +1,6 @@
+from os import environ
 from pathlib import Path
+import re
 from secrets import compare_digest
 from urllib.parse import parse_qs
 
@@ -9,8 +11,13 @@ from fastapi.templating import Jinja2Templates
 from app import identity
 from app.finance import format_amount
 from app.fx import convert_minor
+from app.help_guides import help_topics
 
 APP = Path(__file__).resolve().parent
+URL_PREFIX = environ.get("ESTHER_URL_PREFIX", "")
+if URL_PREFIX and not re.fullmatch(r"/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*", URL_PREFIX):
+    raise ValueError("ESTHER_URL_PREFIX inválido.")
+COOKIE_PATH = URL_PREFIX or "/"
 templates = Jinja2Templates(directory=APP / "templates")
 NO_STORE = {"Cache-Control": "private, no-store"}
 SESSION_COOKIE = "identity_session"
@@ -18,6 +25,15 @@ LOGIN_CSRF_COOKIE = "login_csrf"
 TEXT = {
     "pt": {
         "dashboard": "Painel administrativo",
+        "help": "Ajuda",
+        "help_title": "Manual do sistema",
+        "help_intro": "Escolha uma tarefa para ver as instruções ou abrir o guia na tela.",
+        "help_start": "Mostrar passo a passo na tela",
+        "help_close": "Fechar ajuda",
+        "help_previous": "Anterior",
+        "help_next": "Próximo",
+        "help_finish": "Concluir",
+        "help_step": "Passo",
         "menu": "Alternar menu",
         "language": "Idioma",
         "notice": "Ambiente de homologação com dados fictícios",
@@ -87,6 +103,15 @@ TEXT = {
     },
     "es": {
         "dashboard": "Panel administrativo",
+        "help": "Ayuda",
+        "help_title": "Manual del sistema",
+        "help_intro": "Elige una tarea para ver las instrucciones o abrir la guía en pantalla.",
+        "help_start": "Mostrar paso a paso en pantalla",
+        "help_close": "Cerrar ayuda",
+        "help_previous": "Anterior",
+        "help_next": "Siguiente",
+        "help_finish": "Finalizar",
+        "help_step": "Paso",
         "menu": "Alternar menú",
         "language": "Idioma",
         "notice": "Entorno de pruebas con datos ficticios",
@@ -158,28 +183,33 @@ TEXT = {
 
 
 def redirect(path):
-    return RedirectResponse(path, status_code=303, headers=NO_STORE)
+    return RedirectResponse(URL_PREFIX + path, status_code=303, headers=NO_STORE)
 
 
 def set_cookie(response, request, name, value, max_age):
     response.set_cookie(
         name, value, max_age=max_age, httponly=True, samesite="lax",
-        secure=request.url.scheme == "https",
+        secure=request.url.scheme == "https", path=COOKIE_PATH,
     )
 
 
 def change_language(request, path, lang):
     response = redirect(path)
-    set_cookie(response, request, "locale", lang if lang in TEXT else "pt", 365 * 24 * 60 * 60)
+    set_cookie(response, request, "locale", lang if lang in TEXT else identity.DEFAULT_LOCALE, 365 * 24 * 60 * 60)
     return response
 
 
+def request_locale(request):
+    locale = request.cookies.get("locale")
+    return locale if locale in TEXT else identity.DEFAULT_LOCALE
+
+
 def render(request, template, status=200, **context):
-    locale = request.cookies.get("locale", "pt")
-    if locale not in TEXT:
-        locale = "pt"
+    locale = request_locale(request)
     return templates.TemplateResponse(
-        request, template, {"locale": locale, "t": TEXT[locale], "money": format_amount, "convert": convert_minor, **context},
+        request, template, {"locale": locale, "t": TEXT[locale], "money": format_amount, "convert": convert_minor,
+                            "url_prefix": URL_PREFIX, "route_path": request.url.path.removeprefix(URL_PREFIX),
+                            "help_topics": help_topics(locale, getattr(request.state, "role", None)), **context},
         status_code=status, headers=NO_STORE,
     )
 
@@ -223,7 +253,7 @@ def active_session(request: Request):
     token = request.cookies.get(SESSION_COOKIE)
     account = identity.session_account(token) if token else None
     if account is None:
-        raise HTTPException(303, headers={**NO_STORE, "Location": "/login"})
+        raise HTTPException(303, headers={**NO_STORE, "Location": URL_PREFIX + "/login"})
     request.state.role = account[1]
     return account[0], account[1], session_csrf(token)
 
@@ -328,7 +358,8 @@ TEXT["pt"].update({
     "fx_missing": "Cotação comercial ainda não configurada.", "fx_reference": "Referência consultada",
     "fx_refresh": "Verificar referência", "fx_failure": "A consulta falhou. Confira a data do último valor.",
     "fx_checked": "Última verificação", "fx_published": "Publicação", "fx_equivalent": "Equivalente indicativo",
-    "fx_daily": "O BCP publica a referência em dias úteis. O sistema consulta a tabela a cada hora.",
+    "fx_daily": "O sistema consulta o BCP a cada hora e usa a ExchangeRate-API se a referência do BCP estiver indisponível.",
+    "fx_alternate": "Fonte alternativa da referência exibida.",
     "not_priced": "Preço ainda não cadastrado.", "payment_currency": "Moeda do pagamento",
     "fx_manual_note": "O valor da empresa é aplicado às operações no modo manual.",
 })
@@ -340,7 +371,8 @@ TEXT["es"].update({
     "fx_missing": "La cotización comercial aún no está configurada.", "fx_reference": "Referencia consultada",
     "fx_refresh": "Verificar referencia", "fx_failure": "La consulta falló. Revisa la fecha del último valor.",
     "fx_checked": "Última consulta", "fx_published": "Publicación", "fx_equivalent": "Equivalente indicativo",
-    "fx_daily": "El BCP publica la referencia en días hábiles. El sistema consulta la tabla cada hora.",
+    "fx_daily": "El sistema consulta al BCP cada hora y usa ExchangeRate-API si la referencia del BCP no está disponible.",
+    "fx_alternate": "Fuente alternativa de la referencia mostrada.",
     "not_priced": "Precio aún no registrado.", "payment_currency": "Moneda del pago",
     "fx_manual_note": "El valor de la empresa se aplica a las operaciones en modo manual.",
 })

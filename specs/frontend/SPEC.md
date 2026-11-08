@@ -29,4 +29,8 @@ Referências: [plano](../../docs/PLAN.md), [padrão AdminLTE](../../docs/fronten
 
 ## Interface atual do piloto
 
+### Ajuda guiada
+
+Solicitação autorizada para abrir um manual lateral em português e espanhol, com exemplos e etapas interativas. A ajuda acompanha as permissões existentes. MASTER e DEV veem fluxos administrativos, o operador vê consultas, e manutenção aparece apenas para DEV. Cada assunto abre a tela correspondente e oferece uma sequência navegável com destaque e seta quando o controle estiver disponível. Os passos não executam ações do módulo. Validar rotas com e sem prefixo, teclado, foco, celular e filtragem por perfil.
+
 A homologação inicial evoluiu para as telas dos módulos registrados no índice de Specs. A identidade visual da Esther Beauty 777 usa a logo fornecida, marfim, rosa e bronze, com AdminLTE 3.2 preservado. Login, estados de erro, menu lateral, botões contornados, formulários e relatórios compartilham o tema. O idioma autenticado usa POST com CSRF e preferência por conta. Os totais do painel vêm dos módulos, substituindo as quantidades fixas da prova inicial.

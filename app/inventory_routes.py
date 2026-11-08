@@ -9,7 +9,7 @@ from starlette.concurrency import run_in_threadpool
 from app import inventory, inventory_workbook
 from app.catalog_uploads import upload, workbook_signature
 from app.catalog_workbook import FILE_LIMIT, ImportErrorAtLine
-from app.web import NO_STORE, TEXT, check_csrf, master_session, parse_form, read_form, redirect, render
+from app.web import NO_STORE, TEXT, check_csrf, master_session, parse_form, read_form, redirect, render, request_locale
 
 router = APIRouter()
 
@@ -43,9 +43,7 @@ def import_page(request: Request, master=Depends(master_session)):
 def export_entries(request: Request, page: int = 1, master=Depends(master_session)):
     if not 1 <= page <= 1_000_000:
         raise HTTPException(400)
-    locale = request.cookies.get("locale", "pt")
-    if locale not in inventory_workbook.HEADERS:
-        locale = "pt"
+    locale = request_locale(request)
     data = inventory_workbook.export(page, locale, TEXT[locale])
     if data is None:
         raise HTTPException(404)

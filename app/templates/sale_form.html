@@ -2,13 +2,13 @@
 {% set locale_target = '/sales/' ~ sale.id if sale else '/sales/new' %}
 {% block title %}{{ t.sale ~ ' #' ~ sale.id if sale else t.new_sale }}{% endblock %}
 {% block content %}
-<p><a href="/sales">{{ t.sales }}</a></p>
+<p><a href="{{ url_prefix }}/sales">{{ t.sales }}</a></p>
 <h1>{{ t.sale ~ ' #' ~ sale.id if sale else t.new_sale }}</h1>
 {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
-{% if error == 'sale_version' and sale %}<p><a href="/sales/{{ sale.id }}">{{ t.sale_reload }}</a></p>{% endif %}
+{% if error == 'sale_version' and sale %}<p><a href="{{ url_prefix }}/sales/{{ sale.id }}">{{ t.sale_reload }}</a></p>{% endif %}
 <noscript><p class="alert alert-warning">{{ t.sale_js }}</p></noscript>
-<form id="sale-cart" method="post" action="{{ '/sales/' ~ sale.id ~ '/draft' if sale else '/sales/new' }}"
-      data-rate="{{ rate }}" data-labels="{{ t|tojson|forceescape }}">
+<form id="sale-cart" method="post" action="{{ url_prefix }}{{ '/sales/' ~ sale.id ~ '/draft' if sale else '/sales/new' }}"
+      data-products-url="{{ url_prefix }}/sales/products" data-rate="{{ rate }}" data-labels="{{ t|tojson|forceescape }}">
   <input type="hidden" name="csrf" value="{{ csrf }}">
   {% if sale %}<input type="hidden" name="version" value="{{ form.get('version', '') }}">
   {% else %}<input type="hidden" name="request_key" value="{{ form.get('request_key', '') }}">{% endif %}
@@ -54,7 +54,7 @@
 </form>
 {% if sale %}
 <details><summary>{{ t.cancel }} #{{ sale.id }}</summary>
-  <form action="/sales/{{ sale.id }}/cancel" method="post" class="mt-2">
+  <form action="{{ url_prefix }}/sales/{{ sale.id }}/cancel" method="post" class="mt-2">
     <input type="hidden" name="csrf" value="{{ csrf }}">
     <button class="btn btn-outline-danger">{{ t.cancel }} #{{ sale.id }}</button>
   </form>

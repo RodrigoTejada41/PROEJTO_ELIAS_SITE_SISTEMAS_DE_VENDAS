@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catálogo | Esther Beauty 777</title>
+  <style>
+    :root{--paper:#fffaf5;--blush:#f9ded7;--bronze:#713e24;--ink:#47281d;--line:#dec2ad;--muted:#765747}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--paper);color:var(--ink);font:1rem/1.6 "Segoe UI",sans-serif}
+    a{color:inherit;text-underline-offset:.23em}
+    button{font:inherit;cursor:pointer}
+    :focus-visible{outline:3px solid var(--bronze);outline-offset:4px}
+    h1,h2{font-family:Georgia,serif;font-weight:400;line-height:1.13}
+    h1{font-size:clamp(2.7rem,6vw,5rem);letter-spacing:-.05em;margin:.45rem 0 1rem}
+    .wrap{width:min(100% - 2rem,70rem);margin:auto}
+    header{border-bottom:1px solid var(--line)}
+    .bar{display:flex;justify-content:space-between;align-items:center;gap:.75rem;min-height:5rem;flex-wrap:wrap}
+    .brand{font:1.25rem Georgia,serif;text-decoration:none}
+    .languages button{padding:.35rem .55rem;color:var(--ink);background:transparent;border:1px solid transparent;border-radius:.3rem}
+    .languages [aria-pressed="true"]{background:var(--blush);border-color:var(--line);font-weight:650}
+    main{padding-block:clamp(2rem,6vw,5rem)}
+    .eyebrow{margin:1.6rem 0 0;letter-spacing:.15em;text-transform:uppercase;color:var(--bronze);font-size:.72rem;font-weight:750}
+    .categories{display:flex;flex-wrap:wrap;gap:.6rem;margin-block:1.75rem}
+    .categories a,.button{display:inline-flex;align-items:center;min-height:44px;padding:.45rem .85rem;border:1px solid var(--line);border-radius:.35rem;text-decoration:none}
+    .categories [aria-current="page"],.button{color:white;background:var(--bronze);border-color:var(--bronze)}
+    .categories a:not([aria-current]):hover{background:var(--blush)}
+    .button:hover{background:var(--ink)}
+    .empty{border:1px solid var(--line);border-radius:.6rem;background:#f7ece3;padding:clamp(1rem,4vw,2rem)}
+    .empty h2{margin:0;font-size:1.8rem}
+    .empty p{color:var(--muted);max-width:54ch}
+    .products{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}
+    .product{border:1px solid var(--line);border-radius:.6rem;padding:1rem}
+    .product img{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;background:white}
+    .product h2{font-size:1.5rem}
+    .search{display:grid;gap:.35rem;max-width:30rem;margin-bottom:1rem}
+    .search input{font:inherit;color:var(--ink);background:white;border:1px solid var(--line);border-radius:.35rem;padding:.55rem .75rem;min-height:44px}
+    .pagination{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-top:1.4rem}
+    .pagination button{min-height:44px;border:1px solid var(--line);border-radius:.35rem;padding:.45rem .75rem;background:white;color:var(--ink)}
+    .pagination button:disabled{opacity:.55;cursor:default}
+    .product-brand{color:var(--bronze);font-weight:650}
+    .photo-source{font-size:.78rem;color:var(--muted);margin:.3rem 0 .6rem}
+    [hidden]{display:none!important}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap bar">
+      <a class="brand" id="brand" href="./">Esther Beauty 777</a>
+      <div class="languages" aria-label="Idioma">
+        <button type="button" lang="pt" aria-label="Português" data-language="pt">PT</button>
+        <button type="button" lang="es" aria-label="Español" data-language="es">ES</button>
+      </div>
+    </div>
+  </header>
+  <main class="wrap">
+    <a id="back" href="./#perfumes">Voltar à vitrine</a>
+    <p class="eyebrow" id="eyebrow">Catálogo de perfumes</p>
+    <h1 id="title">Perfumes</h1>
+    <nav class="categories" id="categories" aria-label="Categorias"></nav>
+    <div class="search">
+      <label for="search" id="search-label">Buscar por perfume ou marca</label>
+      <input id="search" type="search" maxlength="100" autocomplete="off">
+    </div>
+    <p id="result-count" role="status"></p>
+    <section id="empty" class="empty" aria-labelledby="empty-title">
+      <h2 id="empty-title">Estamos preparando a vitrine</h2>
+      <p id="empty-text">Se você já tem uma fragrância em mente, conte pra gente qual é. Podemos ajudar a consultar as opções.</p>
+      <a id="inquire" class="button" href="./#contato">Consulte para mais informações</a>
+    </section>
+    <div class="products" id="products" hidden></div>
+    <div class="pagination" id="pagination" hidden>
+      <button type="button" id="previous">Anterior</button>
+      <span id="page-number"></span>
+      <button type="button" id="next">Próxima</button>
+    </div>
+  </main>
+  <script src="catalogo-produtos.js?v=2"></script>
+  <script>
+    const categories = {
+      todos: {pt: "Todos os perfumes", es: "Todos los perfumes"},
+      feminino: {pt: "Femininos", es: "Femeninos"},
+      masculino: {pt: "Masculinos", es: "Masculinos"},
+      arabe: {pt: "Árabes e orientais", es: "Árabes y orientales"},
+      unissex: {pt: "Unissex", es: "Unisex"},
+      nicho: {pt: "De nicho", es: "De nicho"},
+      kit: {pt: "Kits e presentes", es: "Kits y regalos"}
+    };
+    const copy = {
+      pt: {back: "Voltar à vitrine", eyebrow: "Catálogo de perfumes", nav: "Categorias de perfumes",
+        emptyTitle: "Nenhum perfume encontrado", emptyText: "Tente outro nome ou marca. Você também pode contar pra gente qual fragrância procura.",
+        inquire: "Consulte para mais informações", search: "Buscar por perfume ou marca", results: "resultados",
+        previous: "Anterior", next: "Próxima", page: "Página", photo: "Foto de referência"},
+      es: {back: "Volver a la vitrina", eyebrow: "Catálogo de perfumes", nav: "Categorías de perfumes",
+        emptyTitle: "No encontramos perfumes", emptyText: "Prueba con otro nombre o marca. También puedes contarnos qué fragancia buscas.",
+        inquire: "Consulta para más información", search: "Buscar por perfume o marca", results: "resultados",
+        previous: "Anterior", next: "Siguiente", page: "Página", photo: "Foto de referencia"}
+    };
+    const params = new URLSearchParams(location.search);
+    const requested = params.get("categoria");
+    const current = Object.hasOwn(categories, requested) ? requested : "todos";
+    const languageButtons = [...document.querySelectorAll("[data-language]")];
+    const byId = id => document.getElementById(id);
+    const home = location.protocol === "file:" ? "index.html" : "./";
+    const pageSize = 24;
+    let page = 1;
+    let selectedLanguage = params.get("lang");
+    if (selectedLanguage !== "pt" && selectedLanguage !== "es") {
+      try { selectedLanguage = localStorage.getItem("esther-language"); } catch {}
+    }
+    selectedLanguage = selectedLanguage === "pt" ? "pt" : "es";
+    const normalize = value => value.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+
+    function render(language) {
+      selectedLanguage = language;
+      try { localStorage.setItem("esther-language", language); } catch {}
+      const text = copy[language];
+      const name = categories[current][language];
+      document.documentElement.lang = language;
+      document.title = name + " | Esther Beauty 777";
+      byId("brand").href = home + "?lang=" + language;
+      byId("back").href = home + "?lang=" + language + "#perfumes";
+      byId("back").textContent = text.back;
+      byId("eyebrow").textContent = text.eyebrow;
+      byId("title").textContent = name;
+      byId("empty-title").textContent = text.emptyTitle;
+      byId("empty-text").textContent = text.emptyText;
+      byId("search-label").textContent = text.search;
+      byId("previous").textContent = text.previous;
+      byId("next").textContent = text.next;
+      const nav = byId("categories");
+      nav.setAttribute("aria-label", text.nav);
+      nav.replaceChildren(...Object.entries(categories).map(([key, labels]) => {
+        const link = document.createElement("a");
+        link.href = "catalogo.html?" + new URLSearchParams({categoria: key, lang: language});
+        link.textContent = labels[language];
+        if (key === current) link.setAttribute("aria-current", "page");
+        return link;
+      }));
+      const inquiry = home + "?" + new URLSearchParams({categoria: current, lang: language});
+      byId("inquire").href = (current === "todos" ? home + "?lang=" + language : inquiry) + "#contato";
+      byId("inquire").textContent = text.inquire;
+      const query = normalize(byId("search").value.trim());
+      const available = catalogProducts.filter(product =>
+        (current === "todos" || product.categories.includes(current)) &&
+        normalize(product.brand + " " + product.name).includes(query))
+        .sort((first, second) => Number(Boolean(second.image)) - Number(Boolean(first.image)));
+      const pages = Math.max(1, Math.ceil(available.length / pageSize));
+      page = Math.min(page, pages);
+      byId("result-count").textContent = available.length + " " + text.results;
+      byId("pagination").hidden = pages === 1;
+      byId("previous").disabled = page === 1;
+      byId("next").disabled = page === pages;
+      byId("page-number").textContent = text.page + " " + page + " / " + pages;
+      byId("empty").hidden = available.length > 0;
+      byId("products").hidden = available.length === 0;
+      byId("products").replaceChildren(...available.slice((page - 1) * pageSize, page * pageSize).map(product => {
+        const card = document.createElement("article");
+        card.className = "product";
+        if (product.image) {
+          const image = document.createElement("img");
+          image.src = product.image;
+          image.alt = product.name;
+          image.loading = "lazy";
+          card.append(image);
+          if (product.imageSource) {
+            const credit = document.createElement("p");
+            credit.className = "photo-source";
+            const host = new URL(product.imageSource).hostname;
+            credit.textContent = text.photo + " · " + (host === "www.amadeus.com.py" ? "Amadeus" : product.brand);
+            card.append(credit);
+          }
+        }
+        const brand = document.createElement("p");
+        brand.className = "product-brand";
+        brand.textContent = product.brand;
+        const title = document.createElement("h2");
+        title.textContent = product.name;
+        const description = document.createElement("p");
+        description.textContent = product.description[language];
+        const link = document.createElement("a");
+        link.className = "button";
+        const productInquiry = new URLSearchParams({lang: language, produto: product.name});
+        if (current !== "todos") productInquiry.set("categoria", current);
+        link.href = home + "?" + productInquiry + "#contato";
+        link.textContent = text.inquire;
+        card.append(brand, title, description, link);
+        return card;
+      }));
+      languageButtons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.language === language)));
+    }
+    languageButtons.forEach(button => button.addEventListener("click", () => {
+      render(button.dataset.language);
+      const url = new URL(location.href);
+      url.searchParams.set("lang", selectedLanguage);
+      try { history.replaceState(null, "", url); } catch {}
+    }));
+    byId("search").addEventListener("input", () => { page = 1; render(selectedLanguage); });
+    byId("previous").addEventListener("click", () => { page -= 1; render(selectedLanguage); byId("search").focus(); });
+    byId("next").addEventListener("click", () => { page += 1; render(selectedLanguage); byId("search").focus(); });
+    render(selectedLanguage);
+  </script>
+</body>
+</html>

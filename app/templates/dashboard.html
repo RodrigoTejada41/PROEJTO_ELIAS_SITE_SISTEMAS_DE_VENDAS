@@ -8,6 +8,10 @@
   <link rel="stylesheet" href="{{ url_for('static', path='vendor/adminlte.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', path='theme.css') }}">
   <script defer src="{{ url_for('static', path='menu.js') }}"></script>
+  {% if help_topics %}
+  <link rel="stylesheet" href="{{ url_for('static', path='help.css') }}?v=2">
+  <script defer src="{{ url_for('static', path='help.js') }}"></script>
+  {% endif %}
 </head>
 <body>
   <a class="sr-only sr-only-focusable" href="#content">{{ t.skip }}</a>
@@ -16,40 +20,49 @@
             aria-controls="navigation" aria-expanded="true">{{ t.menu }}</button>
     <nav aria-label="{{ t.language }}" class="d-flex">
       {% for code, label in [('pt','Português'), ('es','Español')] %}
-      <form action="/preferences/locale" method="post" class="mx-1">
+      <form action="{{ url_prefix }}/preferences/locale" method="post" class="mx-1">
         <input type="hidden" name="csrf" value="{{ csrf }}">
         <input type="hidden" name="locale" value="{{ code }}">
-        <input type="hidden" name="next" value="{{ locale_target|default(request.url.path) }}">
+        <input type="hidden" name="next" value="{{ locale_target|default(route_path) }}">
         <button class="btn btn-sm btn-outline-dark" lang="{{ code }}" {% if locale == code %}aria-current="true"{% endif %}>{{ label }}</button>
       </form>
       {% endfor %}
     </nav>
-    <form action="/logout" method="post">
-      <input type="hidden" name="csrf" value="{{ csrf }}">
-      <button class="btn btn-sm btn-outline-dark" type="submit">{{ t.logout }}</button>
-    </form>
+    <div class="d-flex align-items-center">
+      {% if help_topics %}
+      <button id="help-open" type="button" class="btn help-trigger mr-2"
+              aria-controls="help-manual" aria-haspopup="dialog">
+        <span class="help-trigger-icon" aria-hidden="true">?</span>
+        {{ t.help }}
+      </button>
+      {% endif %}
+      <form action="{{ url_prefix }}/logout" method="post">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <button class="btn btn-sm btn-outline-dark" type="submit">{{ t.logout }}</button>
+      </form>
+    </div>
   </header>
   <div class="workspace">
     <aside id="navigation" class="brand-panel p-3">
       <img class="brand-logo" src="{{ url_for('static', path='esther-beauty-777.jpeg') }}" alt="Esther Beauty 777" width="1254" height="1254">
       <nav class="brand-navigation" aria-label="{{ 'Navegación principal' if locale == 'es' else 'Navegação principal' }}">
-        <a class="nav-link brand-link" href="/" {% if not managing_operators and not in_catalog and not in_stock and not section %}aria-current="page"{% endif %}>{{ t.dashboard }}</a>
-        <a class="nav-link brand-link" href="/catalog" {% if in_catalog %}aria-current="page"{% endif %}>{{ t.catalog }}</a>
-        <a class="nav-link brand-link" href="/pricing" {% if section == 'pricing' %}aria-current="page"{% endif %}>{{ t.pricing if is_master else t.prices }}</a>
-        <a class="nav-link brand-link" href="/stock" {% if in_stock %}aria-current="page"{% endif %}>{{ t.stock }}</a>
-        <a class="nav-link brand-link" href="/contacts/customers" {% if section == 'customers' %}aria-current="page"{% endif %}>{{ t.customers }}</a>
-        <a class="nav-link brand-link" href="/reports" {% if section == 'reports' %}aria-current="page"{% endif %}>{{ t.reports }}</a>
+        <a class="nav-link brand-link" href="{{ url_prefix }}/" {% if not managing_operators and not in_catalog and not in_stock and not section %}aria-current="page"{% endif %}>{{ t.dashboard }}</a>
+        <a class="nav-link brand-link" href="{{ url_prefix }}/catalog" {% if in_catalog %}aria-current="page"{% endif %}>{{ t.catalog }}</a>
+        <a class="nav-link brand-link" href="{{ url_prefix }}/pricing" {% if section == 'pricing' %}aria-current="page"{% endif %}>{{ t.pricing if is_master else t.prices }}</a>
+        <a class="nav-link brand-link" href="{{ url_prefix }}/stock" {% if in_stock %}aria-current="page"{% endif %}>{{ t.stock }}</a>
+        <a class="nav-link brand-link" href="{{ url_prefix }}/contacts/customers" {% if section == 'customers' %}aria-current="page"{% endif %}>{{ t.customers }}</a>
+        <a class="nav-link brand-link" href="{{ url_prefix }}/reports" {% if section == 'reports' %}aria-current="page"{% endif %}>{{ t.reports }}</a>
         {% if is_master %}
-        <a class="nav-link brand-link" href="/settings/company" {% if section == 'company' %}aria-current="page"{% endif %}>{{ t.company }}</a>
+        <a class="nav-link brand-link" href="{{ url_prefix }}/settings/company" {% if section == 'company' %}aria-current="page"{% endif %}>{{ t.company }}</a>
         {% if request.state.role == 'DEV' %}
-        <a class="nav-link brand-link" href="/maintenance" {% if section == 'maintenance' %}aria-current="page"{% endif %}>{{ t.maintenance }}</a>
+        <a class="nav-link brand-link" href="{{ url_prefix }}/maintenance" {% if section == 'maintenance' %}aria-current="page"{% endif %}>{{ t.maintenance }}</a>
         {% endif %}
-        <a class="nav-link brand-link" href="/sales" {% if section == 'sales' %}aria-current="page"{% endif %}>{{ t.sales }}</a>
-        <a class="nav-link brand-link" href="/commissions" {% if section == 'commissions' %}aria-current="page"{% endif %}>{{ t.commissions }}</a>
-        <a class="nav-link brand-link" href="/finance" {% if section == 'finance' %}aria-current="page"{% endif %}>{{ t.finance }}</a>
-        <a class="nav-link brand-link" href="/audit" {% if section == 'audit' %}aria-current="page"{% endif %}>{{ t.audit }}</a>
-        <a class="nav-link brand-link" href="/contacts/suppliers" {% if section == 'suppliers' %}aria-current="page"{% endif %}>{{ t.suppliers }}</a>
-        <a class="nav-link brand-link" href="/operators" {% if managing_operators %}aria-current="page"{% endif %}>{{ t.operators }}</a>
+        <a class="nav-link brand-link" href="{{ url_prefix }}/sales" {% if section == 'sales' %}aria-current="page"{% endif %}>{{ t.sales }}</a>
+        <a class="nav-link brand-link" href="{{ url_prefix }}/commissions" {% if section == 'commissions' %}aria-current="page"{% endif %}>{{ t.commissions }}</a>
+        <a class="nav-link brand-link" href="{{ url_prefix }}/finance" {% if section == 'finance' %}aria-current="page"{% endif %}>{{ t.finance }}</a>
+        <a class="nav-link brand-link" href="{{ url_prefix }}/audit" {% if section == 'audit' %}aria-current="page"{% endif %}>{{ t.audit }}</a>
+        <a class="nav-link brand-link" href="{{ url_prefix }}/contacts/suppliers" {% if section == 'suppliers' %}aria-current="page"{% endif %}>{{ t.suppliers }}</a>
+        <a class="nav-link brand-link" href="{{ url_prefix }}/operators" {% if managing_operators %}aria-current="page"{% endif %}>{{ t.operators }}</a>
         {% endif %}
       </nav>
     </aside>
@@ -74,5 +87,6 @@
       {% if quote %}{% include "fx_note.html" %}{% endif %}
     </main>
   </div>
+  {% if help_topics %}{% include "help.html" %}{% endif %}
 </body>
 </html>

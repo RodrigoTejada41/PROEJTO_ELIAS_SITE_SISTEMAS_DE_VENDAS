@@ -3,7 +3,7 @@
 {% block title %}{{ t.import_skus }}{% endblock %}
 {% block content %}
 <h1>{{ t.import_skus }}</h1>
-<p><a href="/catalog">{{ t.back_catalog }}</a></p>
+<p><a href="{{ url_prefix }}/catalog">{{ t.back_catalog }}</a></p>
 {% if error %}
 <p class="alert alert-danger" role="alert">{% if line %}{{ t.import_line }} {{ line }}. {% endif %}{{ t[error] }}</p>
 {% endif %}
@@ -17,12 +17,12 @@
 </div>
 {% endif %}
 {% if preview %}
-<form method="post" action="/catalog/import/xlsx/confirm" class="mb-3">
+<form method="post" action="{{ url_prefix }}/catalog/import/xlsx/confirm" class="mb-3">
   <input type="hidden" name="csrf" value="{{ csrf }}">
   <input type="hidden" name="payload" value="{{ payload }}">
   <input type="hidden" name="signature" value="{{ signature }}">
   <button class="btn btn-primary" type="submit">{{ t.workbook_confirm }}</button>
-  <a class="btn btn-outline-dark" href="/catalog/import">{{ t.cancel }}</a>
+  <a class="btn btn-outline-dark" href="{{ url_prefix }}/catalog/import">{{ t.cancel }}</a>
 </form>
 <div class="table-responsive">
   <table class="table table-sm table-striped">
@@ -37,15 +37,15 @@
 </div>
 {% else %}
 <p>{{ t.workbook_help }} {{ t.workbook_limit }}</p>
-<p><a class="btn btn-outline-dark" href="/catalog/import/xlsx/template">{{ t.workbook_template }}</a></p>
-<form method="get" action="/catalog/import/xlsx/export" class="mb-4">
+<p><a class="btn btn-outline-dark" href="{{ url_prefix }}/catalog/import/xlsx/template">{{ t.workbook_template }}</a></p>
+<form method="get" action="{{ url_prefix }}/catalog/import/xlsx/export" class="mb-4">
   <div class="form-group">
     <label for="export-page">{{ t.workbook_batch }}</label>
     <input class="form-control col-sm-3" type="number" name="page" id="export-page" min="1" max="1000000" value="1" required>
   </div>
   <button class="btn btn-outline-dark" type="submit">{{ t.workbook_export }}</button>
 </form>
-<form method="post" action="/catalog/import/xlsx" enctype="multipart/form-data" class="mb-4">
+<form method="post" action="{{ url_prefix }}/catalog/import/xlsx" enctype="multipart/form-data" class="mb-4">
   <input type="hidden" name="csrf" value="{{ csrf }}">
   <div class="form-group">
     <label for="catalog-workbook">{{ t.workbook_file }}</label>
@@ -56,8 +56,8 @@
 <details>
 <summary>{{ t.csv_file }}</summary>
 <p>{{ t.import_help }}</p>
-<p><a href="/catalog/import/template">{{ t.import_template }}</a></p>
-<form method="post" action="/catalog/import" enctype="multipart/form-data">
+<p><a href="{{ url_prefix }}/catalog/import/template">{{ t.import_template }}</a></p>
+<form method="post" action="{{ url_prefix }}/catalog/import" enctype="multipart/form-data">
   <input type="hidden" name="csrf" value="{{ csrf }}">
   <div class="form-group">
     <label for="catalog-file">{{ t.csv_file }}</label>

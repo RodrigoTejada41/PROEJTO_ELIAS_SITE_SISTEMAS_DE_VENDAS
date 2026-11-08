@@ -5,7 +5,7 @@
 {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
 {% if config %}
 <p>{{ config.currency }} · {{ t.scale }} {{ config.scale }}</p>
-<form action="/finance/new/{{ kind }}" method="post">
+<form action="{{ url_prefix }}/finance/new/{{ kind }}" method="post">
   <input type="hidden" name="csrf" value="{{ csrf }}">
   <input type="hidden" name="request_key" value="{{ request_key }}">
   <div class="form-group"><label for="currency">{{ t.currency }}</label><select class="form-control" id="currency" name="currency">{% for currency in ['USD','PYG'] %}<option value="{{ currency }}" {% if (form.currency or config.currency) == currency %}selected{% endif %}>{{ currency }}</option>{% endfor %}</select></div>
@@ -19,5 +19,5 @@
   <div class="form-group"><label for="due_date">{{ t.due_date }}</label><input class="form-control" type="date" id="due_date" name="due_date" value="{{ form.due_date or '' }}" required></div>
   <button class="btn btn-outline-dark">{{ t.save_sku }}</button>
 </form>
-{% else %}<p class="alert alert-info">{{ t.currency_required }}</p><a href="/finance/settings">{{ t.finance_settings }}</a>{% endif %}
+{% else %}<p class="alert alert-info">{{ t.currency_required }}</p><a href="{{ url_prefix }}/finance/settings">{{ t.finance_settings }}</a>{% endif %}
 {% endblock %}

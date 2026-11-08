@@ -2,10 +2,10 @@
 {% set locale_target = '/stock/settings' %}
 {% block title %}{{ t.stock_settings }}{% endblock %}
 {% block content %}
-<p><a href="/stock">{{ t.stock }}</a></p>
+<p><a href="{{ url_prefix }}/stock">{{ t.stock }}</a></p>
 <h1>{{ t.stock_settings }}</h1>
 <p class="alert alert-info" role="status">{{ t.stock_negative_enabled if allow_negative else t.stock_negative_disabled }}</p>
-<form method="post" action="/stock/settings" class="card card-body">
+<form method="post" action="{{ url_prefix }}/stock/settings" class="card card-body">
   <input type="hidden" name="csrf" value="{{ csrf }}">
   <div class="form-check mb-2">
     <input class="form-check-input" type="checkbox" name="allow_negative" id="allow-negative" value="1" {% if allow_negative %}checked{% endif %}>

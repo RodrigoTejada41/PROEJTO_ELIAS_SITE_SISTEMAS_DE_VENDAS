@@ -1,8 +1,8 @@
 <section class="mt-4" aria-labelledby="sales-dashboard-heading">
   <h2 class="h4" id="sales-dashboard-heading">{{ t.sales_dashboard }}</h2>
-  <a class="btn btn-outline-dark btn-sm mb-3" href="/sales/new">{{ t.new_sale }}</a>
+  <a class="btn btn-outline-dark btn-sm mb-3" href="{{ url_prefix }}/sales/new">{{ t.new_sale }}</a>
   {% include "report_nav.html" %}
-  <form method="get" action="/" class="mb-3">
+  <form method="get" action="{{ url_prefix }}/" class="mb-3">
     {% include "report_dates.html" %}
     <button class="btn btn-outline-dark" type="submit">{{ t.filter }}</button>
   </form>

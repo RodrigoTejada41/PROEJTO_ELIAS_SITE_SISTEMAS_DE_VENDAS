@@ -22,6 +22,7 @@ def upload(path, cookies, data, **fields):
 
 class CatalogUploadsTest(PostgresCase):
     def test_import_rollback_and_photo_lifecycle(self):
+        self.master = {**self.master, "locale": "pt"}
         path = "/catalog/import"
         token = csrf(request(path, self.master)[2])
         self.assertEqual(request(path)[0], 303)

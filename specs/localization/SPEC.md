@@ -6,4 +6,6 @@ Interface, formulários e erros controlados em português e espanhol. Login perm
 
 Moeda é independente do idioma: USD com duas casas e PYG inteiro conforme CAM-001. Formulários monetários aceitam ponto ou vírgula decimal sem milhar e rejeitam precisão excedente. Datas operacionais têm dia/mês/ano e eventos de auditoria indicam UTC/offset explicitamente. Troca de idioma não modifica valores financeiros.
 
-Aceite inclui persistência após recarga e novo login, igualdade de mensagens de credencial inválida, recusa de CSRF, fallback português, navegação por teclado e erros 403/404/422 localizados. Variantes regionais adicionais dependem de recorte próprio.
+Aceite inclui persistência após recarga e novo login, igualdade de mensagens de credencial inválida, recusa de CSRF, navegação por teclado e erros 403/404/422 localizados.
+
+O espanhol é o padrão para visitas sem preferência e para contas novas. A escolha de português permanece disponível. A migração 020 altera o padrão do campo de idioma, preservando a preferência gravada de cada conta existente. O site institucional e o catálogo também iniciam em espanhol.

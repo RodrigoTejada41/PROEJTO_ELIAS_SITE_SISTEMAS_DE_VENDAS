@@ -4,7 +4,7 @@
 <h1>{{ t.top_products }}</h1>
 {% include "report_nav.html" %}
 {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
-<form method="get" action="/reports/top-products" class="mb-3">
+<form method="get" action="{{ url_prefix }}/reports/top-products" class="mb-3">
   {% include "report_dates.html" %}
   <div class="form-group"><label for="q">{{ t.search }}</label><input class="form-control" id="q" name="q" maxlength="160" value="{{ query }}"></div>
   <button class="btn btn-outline-dark">{{ t.filter }}</button>

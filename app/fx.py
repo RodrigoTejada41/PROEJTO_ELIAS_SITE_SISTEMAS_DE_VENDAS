@@ -3,6 +3,7 @@
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from html.parser import HTMLParser
+import json
 import re
 from urllib.request import Request, urlopen
 from urllib.parse import urlparse
@@ -12,6 +13,8 @@ from psycopg.rows import dict_row
 
 SCALES = {"USD": 2, "PYG": 0}
 URL = "https://www.bcp.gov.py/webapps/web/cotizacion/monedas"
+ALTERNATE_URL = "https://open.er-api.com/v6/latest/USD"
+PROVIDER_ERRORS = (OSError, ValueError, KeyError, TypeError, OverflowError, InvalidOperation)
 
 
 def convert_minor(minor, source, target, rate):
@@ -130,18 +133,55 @@ def fetch_reference():
     return parse_reference(payload.decode("utf-8"), datetime.now(timezone.utc))
 
 
-def refresh():
+def fetch_alternate():
+    request = Request(ALTERNATE_URL, headers={"Accept": "application/json"})
+    with urlopen(request, timeout=10) as response:
+        origin = urlparse(response.url)
+        if origin.scheme != "https" or origin.hostname != "open.er-api.com":
+            raise ValueError("provider")
+        payload = response.read(1000001)
+        if len(payload) > 1000000:
+            raise ValueError("payload")
+    return parse_alternate(payload, datetime.now(timezone.utc))
+
+
+def parse_alternate(payload, now):
+    quote = json.loads(payload, parse_float=Decimal)
+    if quote["result"] != "success" or quote["base_code"] != "USD":
+        raise ValueError("alternate quote")
+    timestamp = quote["time_last_update_unix"]
+    value = quote["rates"]["PYG"]
+    if type(timestamp) is not int or type(value) not in (int, Decimal):
+        raise ValueError("alternate data")
+    published = datetime.fromtimestamp(timestamp, timezone.utc)
+    rate = Decimal(value)
+    if not rate.is_finite() or not 0 < rate <= 1000000 or not now - timedelta(days=2) <= published <= now:
+        raise ValueError("alternate reference")
+    rate = rate.quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP)
+    if rate == 0:
+        raise ValueError("alternate rate")
+    return rate, published, now + timedelta(hours=1)
+
+
+def fetch_automatic():
+    try:
+        return "bcp", fetch_reference()
+    except PROVIDER_ERRORS:
+        return "exchangerate_api", fetch_alternate()
+
+
+def refresh(*, force=False):
     with psycopg.connect(row_factory=dict_row) as connection:
         locked = connection.execute("SELECT pg_try_advisory_xact_lock(510052028) AS locked").fetchone()["locked"]
         if not locked:
             return False
         policy = connection.execute("SELECT * FROM fx_policy WHERE id").fetchone()
         now = datetime.now(timezone.utc)
-        if policy["next_check"] and policy["next_check"] > now:
+        if not force and policy["next_check"] and policy["next_check"] > now:
             return False
         try:
-            rate, published, next_check = fetch_reference()
-        except (OSError, ValueError, KeyError, TypeError, OverflowError, InvalidOperation):
+            source, (rate, published, next_check) = fetch_automatic()
+        except PROVIDER_ERRORS:
             connection.execute(
                 "UPDATE fx_policy SET last_checked = now(), next_check = now() + interval '1 hour', last_error = 'provider_unavailable' WHERE id"
             )
@@ -149,10 +189,10 @@ def refresh():
         row = connection.execute(
             """
             INSERT INTO fx_rates (pyg_per_usd, source, published_at)
-            VALUES (%s, 'bcp', %s)
+            VALUES (%s, %s, %s)
             ON CONFLICT (source, published_at, pyg_per_usd)
             DO UPDATE SET checked_at = now() RETURNING id
-            """, (rate, published),
+            """, (rate, source, published),
         ).fetchone()
         # Re-read mode after the HTTP request so a simultaneous manual choice is respected.
         policy = connection.execute("SELECT * FROM fx_policy WHERE id FOR UPDATE").fetchone()

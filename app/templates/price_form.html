@@ -3,7 +3,7 @@
 {% block content %}
 <h1 class="h3 text-break">{{ t.pricing }} · {{ sku.code }}</h1>
 {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
-<form action="/pricing/{{ sku.id }}" method="post">
+<form action="{{ url_prefix }}/pricing/{{ sku.id }}" method="post">
   <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="version" value="{{ sku.version }}">
   <div class="form-group"><label for="cost">{{ t.cost }} · USD</label><input class="form-control" id="cost" name="cost" maxlength="20" inputmode="decimal" value="{{ money(sku.usd_cost_minor,2,locale) if sku.usd_cost_minor is not none else '' }}" required></div>
   <div class="form-group"><label for="price">{{ t.selling_price }} · USD</label><input class="form-control" id="price" name="price" maxlength="20" inputmode="decimal" value="{{ money(sku.usd_price_minor,2,locale) if sku.usd_price_minor is not none else '' }}" required></div>

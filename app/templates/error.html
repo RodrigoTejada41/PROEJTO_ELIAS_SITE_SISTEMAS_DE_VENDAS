@@ -10,7 +10,7 @@
 <main class="login-box">
   <div class="card esther-login-card">
     <header class="esther-login-brand"><img class="brand-logo" src="{{ url_for('static', path='esther-beauty-777.jpeg') }}" alt="" width="1254" height="1254"><h1>Esther Beauty <span>777</span></h1></header>
-    <div class="card-body"><h2 class="h5">{{ t[error_key] }}</h2><a class="btn btn-outline-dark" href="/">{{ t.back }}</a></div>
+    <div class="card-body"><h2 class="h5">{{ t[error_key] }}</h2><a class="btn btn-outline-dark" href="{{ url_prefix }}/">{{ t.back }}</a></div>
   </div>
 </main>
 </body>

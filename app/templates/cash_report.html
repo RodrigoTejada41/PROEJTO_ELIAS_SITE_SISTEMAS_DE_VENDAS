@@ -3,10 +3,10 @@
 {% block content %}
 <h1>{{ t.cash_flow }}</h1>
 {% include "report_nav.html" %}
-<p><a href="/finance?kind=receivable&amp;state=open">{{ t.receivable }}</a> ·
-   <a href="/finance?kind=payable&amp;state=open">{{ t.payable }}</a></p>
+<p><a href="{{ url_prefix }}/finance?kind=receivable&amp;state=open">{{ t.receivable }}</a> ·
+   <a href="{{ url_prefix }}/finance?kind=payable&amp;state=open">{{ t.payable }}</a></p>
 {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
-<form method="get" action="/reports/cash" class="mb-3">
+<form method="get" action="{{ url_prefix }}/reports/cash" class="mb-3">
   {% include "report_dates.html" %}
   <div class="form-group"><label for="currency">{{ t.currency }}</label><select class="form-control" name="currency" id="currency">{% for value in ['all','USD','PYG'] %}<option value="{{ value }}" {% if currency == value %}selected{% endif %}>{{ t.all if value == 'all' else value }}</option>{% endfor %}</select></div>
   <div class="form-group">
@@ -22,7 +22,7 @@
 {% for total in totals %}<p class="h4">{{ total.currency }} {{ money(total.amount_minor,2 if total.currency == 'USD' else 0,locale) }}</p>{% endfor %}
 <ul class="list-group mb-3">
 {% for row in rows %}<li class="list-group-item text-break">
-  <a href="/finance/{{ row.title_id }}">{{ t.title }} #{{ row.title_id }}</a> · {{ t[row.action] }} · {{ t[row.kind] }} · {{ t[row.method] }}
+  <a href="{{ url_prefix }}/finance/{{ row.title_id }}">{{ t.title }} #{{ row.title_id }}</a> · {{ t[row.action] }} · {{ t[row.kind] }} · {{ t[row.method] }}
   <p>{{ row.currency }} {{ money(row.amount_minor,2 if row.currency == 'USD' else 0,locale) }} · {{ row.occurred_at.isoformat(timespec='minutes') }}</p>
 </li>
 {% else %}<li class="list-group-item">{{ t.no_events }}</li>{% endfor %}

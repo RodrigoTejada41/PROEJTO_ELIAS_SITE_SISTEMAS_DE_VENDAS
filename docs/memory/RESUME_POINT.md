@@ -177,3 +177,53 @@ Passaram 35 testes em PostgreSQL descartável, incluindo vetor RFC 6238, fluxo A
 A migração 019 adiciona a ativação por código de uso único emitido em terminal privado. O código vale 24 horas. O usuário informa senha e ativação no primeiro acesso, escaneia o QR Code gerado localmente ou usa a chave manual e confirma um TOTP para abrir a sessão. O QR é vinculado ao desafio de cinco minutos. A confirmação consome a ativação e registra auditoria. Contas já cadastradas continuam no fluxo de senha e TOTP.
 
 Passaram 36 testes em PostgreSQL descartável, incluindo os quatro de MFA que cobrem a ausência do QR antes da ativação, resposta sem cache, confirmação do código e consumo da ativação. A compilação, a resolução do Compose e o pip-audit passaram. Docker Engine inacessível e leitura do QR pelo Google Authenticator em aparelho real pendente.
+
+## VPS Esther Beauty 777
+
+Em 08/11/2026, instalado o Compose de produção em `/opt/esther-beauty` na VPS autorizada, com a base Git `303eb1b` e ajuste de prefixo `/Sistema` aplicado no checkout. Build Linux e 19 migrações concluídos. A aplicação atende no loopback e o banco fica na rede interna. Verificados 36 testes em PostgreSQL descartável, CSS e logo na VPS, cookie Secure limitado ao prefixo, IP encaminhado e desafio de ativação de MASTER e DEV sem abrir sessão. Confirmados um MASTER, um DEV e zero produtos, vendas, contatos e títulos. Backup inicial restaurado em banco descartável com 19 migrações, duas contas e zero produtos.
+
+O Nginx do iContainer tem um host HTTP para o desafio ACME e uma configuração HTTPS preparada para `/Sistema/`. A raiz está reservada ao site institucional. O DNS autoritativo do Cloudflare ainda não publica A para `estherbeauty777.com`. Após o registro apontar para a VPS, emitir o certificado, ativar a configuração HTTPS e validar a rota pública, os estáticos e o primeiro acesso. Configurar renovação do certificado. Backup externo e varredura das imagens continuam pendentes. Credenciais de primeiro acesso entregues em arquivo privado local.
+
+### HTTPS publicado
+
+O registro A do Cloudflare passou a resolver para a VPS. Certificado Let's Encrypt emitido para `estherbeauty777.com` e configuração HTTPS ativada no Nginx. Verificados redirecionamento HTTP para HTTPS, login público em `/Sistema/login`, CSS, logo e cookie Secure limitado a `/Sistema`. MASTER e DEV chegaram à etapa de ativação pelo HTTPS sem sessão autenticada. O cadastro efetivo do Google Authenticator fica com os titulares. A raiz está reservada ao site e retorna HTTP 403 enquanto não há página inicial.
+
+Renovação diária configurada pelo timer `esther-renew-tls.timer` na VPS. A execução do serviço e a simulação de renovação do Certbot passaram. A configuração anterior do Nginx foi preservada para retorno. Backup externo e varredura das imagens continuam pendentes.
+
+O vhost HTTPS foi preparado para o proxy Cloudflare com as faixas IPv4 e IPv6 oficiais e confiança em `CF-Connecting-IP` apenas nessas redes. Nginx validado e recarregado. Em acesso direto, um cabeçalho forjado não alterou o IP registrado no limite de login. O registro ainda responde como Somente DNS. Full (strict), ativação da nuvem laranja e teste pela borda aguardam acesso autenticado ao painel.
+
+Após configuração pelo usuário, o DNS passou a retornar os IPs do Cloudflare. Confirmados HTTP 200 no login e CSS com `CF-Ray`, cookie Secure, login dinâmico sem cache e HTTP 401 de teste registrado na aplicação com o IP do visitante. Uma primeira requisição automatizada com o agente padrão recebeu 403 e a repetição com agente diferente passou. A opção Full (strict) não foi inspecionada diretamente no painel.
+
+O Nginx passou a redirecionar `/sistema` e seus subcaminhos para `/Sistema/`, preservando a query string. O 404 anterior foi reproduzido e, após o reload, as duas grafias chegaram ao login com HTTP 200 pelo domínio público.
+
+## Ajuda guiada
+
+O painel autenticado recebeu um manual lateral PT/ES filtrado por perfil. Cada assunto tem passos expansíveis e abre um guia na tela com destaque e seta quando o alvo está presente e cabe na janela. MASTER e DEV veem procedimentos administrativos, operadores veem consultas e manutenção fica com DEV. Sem migração.
+
+Edge validou em 1280 e 390 px abertura do painel, navegação por passos, setas, foco, Escape, tradução e restrições para os três perfis em PostgreSQL descartável. Passaram 36 testes PostgreSQL, compilação e sintaxe JavaScript. Build aplicado apenas ao container web da VPS, que ficou saudável. Login e recursos do manual retornaram HTTP 200 em `/Sistema/`. Imagem anterior preservada como `esther-beauty-app:before-help`. Validação autenticada em produção e revisão independente pendentes.
+
+Botão Ajuda destacado em bronze com ícone, área de clique de 44 px e posição ao lado de Sair. Edge validou layout em 1440 e 390 px, rótulos PT/ES, abertura por Enter e retorno de foco após Escape. Atualização publicada no container web da VPS e CSS versionado conferido pelo endereço público. Retorno pela imagem `esther-beauty-app:before-help-highlight`.
+
+## Site institucional
+
+Após aceite do modelo offline, publicada a página institucional PT/ES na raiz de `estherbeauty777.com`, no diretório público do Nginx. A fonte do modelo está em `prototipos/site-institucional/dist/index.html`. A vitrine usa ilustrações temporárias e textos de consulta. O formulário prepara e copia a mensagem até a confirmação do WhatsApp. Edge validou a página pública em 1440 e 390 px, troca de idioma, escolha de categoria e rascunho do formulário. O login em `/sistema` segue acessível pelo domínio público. Fotos e dados do catálogo real aguardam material da empresa.
+
+Os seis cartões agora abrem `catalogo.html` na categoria e no idioma selecionados. A consulta retorna ao formulário com a categoria preenchida. Confirmados zero produtos ativos e zero fotos no sistema. A página de catálogo exibe a opção de consulta enquanto aguarda os itens reais. As seis categorias foram testadas offline em PT/ES e o fluxo público passou no Edge. A versão anterior da página inicial foi preservada em `.local/backups/esther-site-before-catalog.html` na VPS.
+
+### Importação de produtos da Esther Beauty 777
+
+As seis planilhas do ZIP do usuário foram lidas sem publicar os arquivos originais. A coluna PRECIO foi confirmada como custo de compra em USD. Importados 1.260 SKUs no sistema com marca e descrição, 895 com custo e 365 sem custo informado. Preços de venda em branco e zero movimentações de estoque. O procedimento reutilizou a escrita e a auditoria do catálogo sob a conta DEV, foi testado em restauração isolada do backup e repetido sem duplicatas. Backup prévio na VPS em `.local/backups/esther-before-perfume-import.dump`.
+
+Publicadas 1.221 fichas de perfumaria, com descrição PT/ES baseada em volume, concentração e indicação do fornecedor quando presentes. Custos, preços, quantidades e códigos internos ficaram fora do conjunto público. Validadas busca, paginação, consulta por produto e links. As planilhas não continham fotos. Após os ajustes, aplicado o logo Esther Beauty 777 aos rótulos dos frascos ilustrados na página inicial. Edge conferiu o site público, o catálogo e o login administrativo.
+
+Espanhol configurado como idioma inicial do site, do catálogo e do sistema. Português segue selecionável e as escolhas existentes foram preservadas. A migração 020 alterou apenas o valor padrão de contas novas. Passaram 36 testes PostgreSQL, build da aplicação, healthcheck na VPS e navegação pública PT/ES no Edge. Permanecem os 1.260 SKUs administrativos.
+
+O catálogo público recebeu 96 fotos de referência, 80 da Amadeus e 16 de fabricantes. A comparação usou identidade do produto, concentração e volume. Quatro fotos com conteúdo idêntico em fichas distintas da Amadeus ficaram fora, assim como uma imagem oficial com nome de arquivo conflitante. A origem é identificada em cada ficha com foto. Verificados em produção carregamento das imagens, busca e ausência de campos financeiros nos dados públicos. As demais fichas continuam disponíveis para consulta. Backup da aplicação e da página pública preservados na VPS.
+
+As mesmas 96 fotos foram vinculadas aos SKUs administrativos por código, marca e descrição. Reutilizada a normalização JPEG do sistema, com atualização da versão e evento de auditoria por produto. Uma restauração isolada validou a inclusão e a repetição com preservação das fotos. Confirmadas 96 associações em produção. Backup anterior em `.local/backups/esther-before-catalog-photos.dump` na VPS.
+
+### Câmbio automático na VPS
+
+Em 08/11/2026, após autorização para usar uma fonte alternativa identificada, foi publicada a atualização do app e do worker. O BCP segue prioritário e retornava HTTP 403 da VPS. A consulta inicial registrou ExchangeRate-API como origem e 6107.599103 PYG por USD, publicados às 00:02:31 UTC. Política automática ativa, última consulta sem erro e próxima consulta programada. A tela de câmbio informa a origem em português e espanhol. A migração 014 já aceitava essa origem.
+
+Passaram 38 testes com PostgreSQL descartável, incluindo falha dupla, preservação da cotação manual e retorno ao BCP, além de compilação Python, build Docker, healthcheck e login público HTTP 200. Tela autenticada de produção e revisão independente não verificadas. Backup da base inspecionado com pg_restore -l em .local/fx-fallback-backup, sem restauração executada nesta atualização. Imagens anteriores preservadas como esther-beauty-app:before-fx-fallback e esther-beauty-app:before-fx-worker.

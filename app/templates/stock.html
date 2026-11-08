@@ -5,8 +5,8 @@
 {% if allow_negative %}<p class="alert alert-warning" role="status">{{ t.stock_negative_enabled }}</p>{% endif %}
 {% if is_master %}
 <div class="mb-3">
-  <a class="btn btn-outline-dark mb-2" href="/stock/settings">{{ t.stock_settings }}</a>
-  <a class="btn btn-primary mb-2" href="/stock/import">{{ t.stock_batch }}</a>
+  <a class="btn btn-outline-dark mb-2" href="{{ url_prefix }}/stock/settings">{{ t.stock_settings }}</a>
+  <a class="btn btn-primary mb-2" href="{{ url_prefix }}/stock/import">{{ t.stock_batch }}</a>
 </div>
 {% endif %}
 <ul class="list-group">
@@ -15,7 +15,7 @@
     <h2 class="h5">{{ sku.description }}</h2>
     <p>{{ sku.code }} · {{ t.balance }} <strong{% if sku.balance < 0 %} class="text-danger"{% endif %}>{{ sku.balance }}</strong>
        {% if not sku.active %} · {{ t.inactive }}{% endif %}</p>
-    <a class="btn btn-outline-dark btn-sm" href="/stock/{{ sku.id }}">{{ t.history }} · {{ sku.code }}</a>
+    <a class="btn btn-outline-dark btn-sm" href="{{ url_prefix }}/stock/{{ sku.id }}">{{ t.history }} · {{ sku.code }}</a>
   </li>
 {% else %}
   <li class="list-group-item">{{ t.no_skus }}</li>

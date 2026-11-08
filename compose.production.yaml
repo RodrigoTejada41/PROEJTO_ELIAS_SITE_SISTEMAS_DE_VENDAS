@@ -21,6 +21,8 @@ services:
       ESTHER_PROXY_IP: ${ESTHER_PROXY_IP:?Defina o IP do proxy visto pelo Uvicorn}
       ESTHER_MFA_REQUIRED: "1"
       ESTHER_MFA_KEY_FILE: /run/secrets/production_mfa
+      ESTHER_URL_PREFIX: ${ESTHER_URL_PREFIX:-}
+      UVICORN_ROOT_PATH: ${ESTHER_URL_PREFIX:-}
     command: ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
 
   fx_worker:

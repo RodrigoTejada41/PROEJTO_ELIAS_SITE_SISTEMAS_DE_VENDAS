@@ -160,7 +160,7 @@ async function findProducts(revision) {
   if (!query) return;
   status.textContent = labels.sale_loading;
   try {
-    const response = await fetch("/sales/products?q=" + encodeURIComponent(query));
+    const response = await fetch(form.dataset.productsUrl + "?q=" + encodeURIComponent(query));
     if (!response.ok || response.redirected) throw new Error("search");
     const products = await response.json();
     if (revision === searchRevision) showProducts(products);

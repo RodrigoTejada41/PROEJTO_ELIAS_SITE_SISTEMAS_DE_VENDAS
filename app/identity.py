@@ -15,6 +15,7 @@ from app.bootstrap_master import hash_master_password, validate_username
 from app.recover_master import replace_master_password
 
 SESSION_SECONDS = 8 * 60 * 60
+DEFAULT_LOCALE = "es"
 PASSWORDS = PasswordHasher()
 DUMMY_HASH = PASSWORDS.hash(token_urlsafe(32))
 
@@ -299,7 +300,7 @@ def preferred_locale(token: str) -> str:
             WHERE session.token_hash = %s AND session.expires_at > now() AND account.active
             """, (digest(token),),
         ).fetchone()
-        return row[0] if row else "pt"
+        return row[0] if row else DEFAULT_LOCALE
 
 
 def set_locale(token: str, locale: str) -> None:

@@ -5,7 +5,7 @@ from fastapi.responses import Response
 
 from app import reports
 from app.web import is_admin_role
-from app.web import active_session, master_session, change_language, render, TEXT
+from app.web import active_session, master_session, change_language, render, request_locale, TEXT
 
 router = APIRouter()
 
@@ -19,8 +19,8 @@ def stock_report(request: Request, q: str = "", status: Literal["all", "active",
     selected_status = status if is_admin_role(account[1]) else "active"
     query = q.strip().replace(chr(0), "")[:160]
     page = max(1, min(page, 1000000))
-    locale = request.cookies.get("locale", "pt")
-    text = TEXT.get(locale, TEXT["pt"])
+    locale = request_locale(request)
+    text = TEXT[locale]
     error = None
     response_status = 200
     try:
@@ -81,7 +81,7 @@ def cash_report(request: Request, start: str = "", end: str = "", currency: Lite
     except ValueError:
         rows, totals, has_next = reports.cash(lower, upper, currency, page, nature=nature)
         error, status = "export_limit", 422
-    text = TEXT.get(request.cookies.get("locale", "pt"), TEXT["pt"])
+    text = TEXT[request_locale(request)]
     if export and not error:
         body = reports.csv_text(
             [(r["occurred_at"].isoformat(), r["title_id"], r["currency"],
@@ -114,7 +114,7 @@ def sales_report(request: Request, start: str = "", end: str = "", seller_id: st
     except ValueError:
         rows, total, has_next = reports.sale_report(lower, upper, seller_id, page)
         error, status = "export_limit", 422
-    text = TEXT.get(request.cookies.get("locale", "pt"), TEXT["pt"])
+    text = TEXT[request_locale(request)]
     if export and not error:
         body = reports.csv_text(
             [(r["id"], r["confirmed_at"].isoformat(), r["seller_name"], r["customer_name"] or "",
@@ -148,7 +148,7 @@ def top_report(request: Request, start: str = "", end: str = "", seller_id: str 
             rows, has_next = reports.product_ranking(lower, upper, seller, query, page, False)
             error, status = "export_limit", 422
     if export and not error:
-        text = TEXT.get(request.cookies.get("locale", "pt"), TEXT["pt"])
+        text = TEXT[request_locale(request)]
         body = reports.csv_text(
             [(r["code_snapshot"], r["description"], r["quantity"]) for r in rows],
             [text["code"], text["description"], text["quantity"]],

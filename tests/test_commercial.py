@@ -75,7 +75,7 @@ class CommercialIntegrationTest(PostgresCase):
         catalog.deactivate_sku(self.actor_id, inactive_id)
 
         for cookies, expected in ((self.master, 7), (self.reader, 5)):
-            status, headers, body = request("/reports", cookies, query=b"status=all&export=true")
+            status, headers, body = request("/reports", {**cookies, "locale": "pt"}, query=b"status=all&export=true")
             self.assertEqual(status, 200)
             rows = list(csv.DictReader(StringIO(body.decode("utf-8-sig"))))
             self.assertEqual(sum(int(row["Saldo"]) for row in rows), expected)

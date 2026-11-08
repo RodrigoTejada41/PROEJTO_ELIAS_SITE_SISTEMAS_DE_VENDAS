@@ -2,15 +2,15 @@
 {% block title %}{{ t.sales }}{% endblock %}
 {% block content %}
 <h1>{{ t.sales }}</h1>
-<a class="btn btn-outline-dark mb-3" href="/sales/new">{{ t.new_sale }}</a>
-<form method="get" action="/sales" class="mb-3">
+<a class="btn btn-outline-dark mb-3" href="{{ url_prefix }}/sales/new">{{ t.new_sale }}</a>
+<form method="get" action="{{ url_prefix }}/sales" class="mb-3">
   <label for="state">{{ t.status }}</label>
   <select class="form-control mb-2" id="state" name="state">{% for value in ['all','draft','confirmed','canceled'] %}<option value="{{ value }}" {% if state == value %}selected{% endif %}>{{ t[value] }}</option>{% endfor %}</select>
   <button class="btn btn-outline-dark">{{ t.filter }}</button>
 </form>
 <ul class="list-group mb-3">
 {% for sale in rows %}
-<li class="list-group-item text-break"><a href="/sales/{{ sale.id }}">#{{ sale.id }} · {{ t[sale.status] }}</a> · {{ sale.customer_name or '' }} · {{ sale.seller_name }} · {{ sale.created_at.isoformat(timespec='minutes') }}</li>
+<li class="list-group-item text-break"><a href="{{ url_prefix }}/sales/{{ sale.id }}">#{{ sale.id }} · {{ t[sale.status] }}</a> · {{ sale.customer_name or '' }} · {{ sale.seller_name }} · {{ sale.created_at.isoformat(timespec='minutes') }}</li>
 {% else %}<li class="list-group-item">{{ t.no_sales }}</li>{% endfor %}
 </ul>
 <nav>

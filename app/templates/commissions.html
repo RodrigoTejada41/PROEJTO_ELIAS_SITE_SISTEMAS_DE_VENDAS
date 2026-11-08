@@ -5,7 +5,7 @@
 <h1>{{ t.commissions }}</h1>
 {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
 <h2 class="h4">{{ t.commission_rules }}</h2>
-<form action="/commissions/rules" method="post" class="card card-body">
+<form action="{{ url_prefix }}/commissions/rules" method="post" class="card card-body">
   <input type="hidden" name="csrf" value="{{ csrf }}">
   <div class="form-group"><label for="seller_id">{{ t.seller }}</label><select class="form-control" id="seller_id" name="seller_id" required><option value=""></option>{% for seller in sellers %}<option value="{{ seller.id }}">{{ seller.username }}</option>{% endfor %}</select></div>
   <div class="form-group"><label for="percent">{{ t.percent }}</label><input class="form-control" id="percent" name="percent" inputmode="decimal" maxlength="8" required></div>
@@ -15,7 +15,7 @@
 <ul class="list-group">
 {% for seller in sellers %}
 <li class="list-group-item text-break">
-  <h2 class="h5"><a href="/commissions/{{ seller.id }}">{{ seller.username }}</a></h2>
+  <h2 class="h5"><a href="{{ url_prefix }}/commissions/{{ seller.id }}">{{ seller.username }}</a></h2>
   {% if seller.percent is not none %}<p>{{ seller.percent }}% · {{ t.commission_confirmed if seller.event == 'confirmed' else t.received }}</p>{% else %}<p>{{ t.commission_no_rule }}</p>{% endif %}
   <p>{{ t.commission_earned }} USD {{ money(seller.earned,2,locale) }} · {{ t.commission_paid }} USD {{ money(seller.paid,2,locale) }}</p>
   <p>{{ t.commission_balance }} <strong>USD {{ money(seller.balance,2,locale) }}</strong></p>

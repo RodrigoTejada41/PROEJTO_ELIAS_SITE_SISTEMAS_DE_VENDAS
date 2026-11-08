@@ -22,7 +22,7 @@
           <a href="?lang=es" lang="es" {% if locale == 'es' %}aria-current="true"{% endif %}>Español</a>
         </nav>
         {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
-        <form action="{{ '/login/verify' if second_factor else '/login' }}" method="post">
+        <form action="{{ url_prefix }}{{ '/login/verify' if second_factor else '/login' }}" method="post">
           <input type="hidden" name="csrf" value="{{ csrf }}">
           {% if second_factor %}
           {% if mfa_stage == 'activate' %}
@@ -50,7 +50,7 @@
           </div>
           <button class="btn btn-block esther-login-submit" type="submit">{{ t.mfa_verify }}</button>
           {% endif %}
-          <a class="d-block mt-3" href="/login">{{ t.mfa_back }}</a>
+          <a class="d-block mt-3" href="{{ url_prefix }}/login">{{ t.mfa_back }}</a>
           {% else %}
           <div class="form-group">
             <label for="username">{{ t.username }}</label>

@@ -18,7 +18,7 @@ from app.inventory_routes import router as inventory_router
 from app.catalog_uploads import router as catalog_upload_router
 from app.web import is_admin_role
 from app.web import (
-    APP, LOGIN_CSRF_COOKIE, NO_STORE, SESSION_COOKIE, TEXT,
+    APP, COOKIE_PATH, LOGIN_CSRF_COOKIE, NO_STORE, SESSION_COOKIE, TEXT,
     active_session, master_session, redirect, set_cookie, change_language, render,
     parse_form, read_form, read_catalog_form, check_csrf, session_csrf,
 )
@@ -126,8 +126,8 @@ def submit_second_factor(request: Request, form: dict = Depends(read_form)):
 
 def finish_login(request, token):
     response = redirect("/")
-    response.delete_cookie(LOGIN_CSRF_COOKIE)
-    response.delete_cookie(MFA_COOKIE)
+    response.delete_cookie(LOGIN_CSRF_COOKIE, path=COOKIE_PATH)
+    response.delete_cookie(MFA_COOKIE, path=COOKIE_PATH)
     set_cookie(response, request, SESSION_COOKIE, token, identity.SESSION_SECONDS)
     locale = request.cookies.get("locale")
     if locale not in TEXT:
@@ -140,9 +140,9 @@ def finish_login(request, token):
 @app.post("/preferences/locale")
 def store_locale(request: Request, account=Depends(active_session), form: dict = Depends(read_form)):
     check_csrf(form, account[2])
-    locale = form.get("locale", "pt")
+    locale = form.get("locale", identity.DEFAULT_LOCALE)
     if locale not in TEXT:
-        locale = "pt"
+        locale = identity.DEFAULT_LOCALE
     token = request.cookies[SESSION_COOKIE]
     identity.set_locale(token, locale)
     target = form.get("next", "/")
@@ -159,7 +159,7 @@ def logout(request: Request, form: dict = Depends(read_form)):
     check_csrf(form, session_csrf(token))
     identity.logout(token)
     response = redirect("/login")
-    response.delete_cookie(SESSION_COOKIE)
+    response.delete_cookie(SESSION_COOKIE, path=COOKIE_PATH)
     return response
 
 

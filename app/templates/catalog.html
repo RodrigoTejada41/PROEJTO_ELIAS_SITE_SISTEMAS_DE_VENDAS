@@ -2,7 +2,7 @@
 {% block title %}{{ t.catalog }}{% endblock %}
 {% block content %}
 <h1>{{ t.catalog }}</h1>
-<form action="/catalog" method="get" class="mb-3">
+<form action="{{ url_prefix }}/catalog" method="get" class="mb-3">
   <label for="q">{{ t.search }}</label>
   <div class="input-group">
     <input id="q" name="q" class="form-control" maxlength="160" value="{{ query }}">
@@ -12,15 +12,15 @@
   </div>
 </form>
 {% if is_master %}
-<a class="btn btn-primary mb-3" href="/catalog/new">{{ t.create_sku }}</a>
-<a class="btn btn-outline-dark mb-3" href="/catalog/import">{{ t.import_skus }}</a>
+<a class="btn btn-primary mb-3" href="{{ url_prefix }}/catalog/new">{{ t.create_sku }}</a>
+<a class="btn btn-outline-dark mb-3" href="{{ url_prefix }}/catalog/import">{{ t.import_skus }}</a>
 {% endif %}
 <ul class="list-group">
   {% for sku in skus %}
   <li class="list-group-item text-break">
     <h2 class="h5">#{{ sku.id }} · {{ sku.description }}</h2>
     {% if sku.has_image %}
-    <img class="img-thumbnail mb-2" width="112" src="/catalog/{{ sku.id }}/image"
+    <img class="img-thumbnail mb-2" width="112" src="{{ url_prefix }}/catalog/{{ sku.id }}/image"
          loading="lazy" alt="{{ t.product_photo }} · {{ sku.description }}">
     {% endif %}
     <p class="mb-1">{{ sku.code }} · {{ t.active if sku.active else t.inactive }}</p>
@@ -32,12 +32,12 @@
     {% endif %}
     {% if is_master %}
     {% if sku.usd_cost_minor is not none %}<p>{{ t.cost }} USD {{ money(sku.usd_cost_minor,2,locale) }}{% if quote %} · PYG {{ money(convert(sku.usd_cost_minor,'USD','PYG',quote.pyg_per_usd),0,locale) }}{% endif %}</p>{% endif %}
-    <p><a href="/pricing/{{ sku.id }}">{{ t.pricing }}</a></p>
+    <p><a href="{{ url_prefix }}/pricing/{{ sku.id }}">{{ t.pricing }}</a></p>
     <div class="d-flex flex-wrap">
-      <a class="btn btn-sm btn-outline-dark mr-2" href="/catalog/{{ sku.id }}/edit"
+      <a class="btn btn-sm btn-outline-dark mr-2" href="{{ url_prefix }}/catalog/{{ sku.id }}/edit"
          aria-label="{{ t.edit_sku }} {{ sku.code }}">{{ t.edit_sku }}</a>
       {% if sku.active %}
-      <form action="/catalog/{{ sku.id }}/deactivate" method="post">
+      <form action="{{ url_prefix }}/catalog/{{ sku.id }}/deactivate" method="post">
         <input type="hidden" name="csrf" value="{{ csrf }}">
         <button class="btn btn-sm btn-outline-danger" type="submit"
                 aria-label="{{ t.deactivate }} {{ sku.code }}">{{ t.deactivate }}</button>

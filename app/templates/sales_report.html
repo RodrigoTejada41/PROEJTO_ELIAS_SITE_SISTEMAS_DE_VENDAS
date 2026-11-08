@@ -4,7 +4,7 @@
 <h1>{{ t.sales_report }}</h1>
 {% include "report_nav.html" %}
 {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
-<form method="get" action="/reports/sales" class="mb-3">
+<form method="get" action="{{ url_prefix }}/reports/sales" class="mb-3">
   {% include "report_dates.html" %}
   <button class="btn btn-outline-dark">{{ t.filter }}</button><button class="btn btn-outline-dark" name="export" value="true">{{ t.export_csv }}</button>
 </form>
@@ -12,7 +12,7 @@
 {% if total.missing_rate %}<p class="small">{{ t.report_missing_rate }}</p>{% endif %}
 <ul class="list-group mb-3">
 {% for row in rows %}<li class="list-group-item text-break">
-  <a href="/sales/{{ row.id }}">{{ t.sale }} #{{ row.id }}</a> · {{ row.seller_name }} · {{ row.customer_name or '' }}
+  <a href="{{ url_prefix }}/sales/{{ row.id }}">{{ t.sale }} #{{ row.id }}</a> · {{ row.seller_name }} · {{ row.customer_name or '' }}
   <p>USD {{ money(row.net_minor,2,locale) }}{% if row.pyg_per_usd %} · PYG {{ money(convert(row.net_minor,'USD','PYG',row.pyg_per_usd),0,locale) }}{% endif %} · {{ row.confirmed_at.isoformat(timespec='minutes') }}</p>
   {% if row.pyg_per_usd %}<p class="small">{{ t.fx }} {{ row.pyg_per_usd }}{% if row.rate_source == 'bcp' %}<a href="https://www.bcp.gov.py/webapps/web/cotizacion/monedas" target="_blank" rel="noopener noreferrer">Banco Central del Paraguay</a>{% elif row.rate_source == 'exchangerate_api' %} · <a href="https://www.exchangerate-api.com" target="_blank" rel="noopener noreferrer">Rates By ExchangeRate-API</a>{% endif %}</p>{% endif %}
 </li>

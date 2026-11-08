@@ -1,0 +1,72 @@
+.help-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  min-height: 44px;
+  padding: .4rem .8rem;
+  color: #fff;
+  background: var(--esther-bronze);
+  border: 1px solid var(--esther-bronze);
+  border-radius: .6rem;
+  font-weight: 700;
+}
+.help-trigger:hover,
+.help-trigger:focus { color: #fff; background: var(--esther-ink); }
+.help-trigger-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  line-height: 1;
+}
+.help-manual,
+.help-tour {
+  color: var(--esther-ink);
+  background: var(--esther-ivory);
+  border: 1px solid var(--esther-bronze);
+  box-shadow: 0 8px 28px rgb(71 40 29 / 24%);
+}
+.help-manual {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(100%, 27rem);
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: 1rem;
+  overflow-y: auto;
+}
+.help-manual::backdrop { background: rgb(71 40 29 / 34%); }
+.help-heading,
+.help-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.help-heading { justify-content: space-between; margin-bottom: .75rem; }
+.help-topic { border-top: 1px solid #dfc6b4; padding-block: .75rem; }
+.help-topic summary { font-weight: 600; cursor: pointer; }
+.help-topic ol { padding-left: 1.5rem; margin-top: .75rem; }
+.help-topic li + li { margin-top: .5rem; }
+.help-tour {
+  position: fixed;
+  z-index: 1050;
+  right: .75rem;
+  bottom: .75rem;
+  width: min(calc(100% - 1.5rem), 24rem);
+  border-radius: .65rem;
+  padding: .9rem;
+}
+.help-tour[data-arrow] { right: auto; bottom: auto; }
+.help-tour[data-arrow]::before {
+  content: "";
+  position: absolute;
+  left: var(--help-arrow-offset);
+  width: .8rem;
+  height: .8rem;
+  background: var(--esther-ivory);
+  border-top: 1px solid var(--esther-bronze);
+  border-left: 1px solid var(--esther-bronze);
+}
+.help-tour[data-arrow="top"]::before { top: 0; transform: translate(-50%, -50%) rotate(45deg); }
+.help-tour[data-arrow="bottom"]::before { bottom: 0; transform: translate(-50%, 50%) rotate(225deg); }
+.help-target { outline: 3px solid var(--esther-bronze); outline-offset: 4px; }

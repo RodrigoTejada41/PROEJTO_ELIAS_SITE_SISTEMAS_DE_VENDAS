@@ -24,7 +24,7 @@ class SaleCartTest(PostgresCase):
         line = {"id": str(sku), "code": "CART-A", "description": "Produto A", "quantity": "3", "price": "3"}
         form = {"csrf": token, "request_key": str(uuid4()), "seller_id": str(self.actor_id),
                 "due_date": "2026-11-30", "discount": "1", "cart": json.dumps([line]), "action": "confirm"}
-        status, _, body = request(path, self.master, form)
+        status, _, body = request(path, {**self.master, "locale": "pt"}, form)
         self.assertEqual(status, 409)
         self.assertIn(b"Estoque insuficiente", body)
         draft = sales.list_sales("draft", 1)[0][0]

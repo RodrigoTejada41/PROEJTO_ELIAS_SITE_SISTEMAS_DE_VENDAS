@@ -2,12 +2,12 @@
 {% set locale_target = '/sales/' ~ sale.id %}
 {% block title %}{{ t.sale }} #{{ sale.id }}{% endblock %}
 {% block content %}
-<p><a href="/sales">{{ t.sales }}</a></p>
+<p><a href="{{ url_prefix }}/sales">{{ t.sales }}</a></p>
 <h1>{{ t.sale }} #{{ sale.id }}</h1>
 <p>{{ t[sale.status] }} · {{ sale.customer_name or '' }} · {{ t.seller }} {{ sale.seller_name }}</p>
 <p>{{ t.due_date }} {{ sale.due_date.strftime('%d/%m/%Y') }} · {{ t.discount }} {{ money(sale.discount_minor,2,locale) }}</p>
 {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
-{% if error == 'receipt_company_required' %}<p><a href="/settings/company">{{ t.company }}</a></p>{% endif %}
+{% if error == 'receipt_company_required' %}<p><a href="{{ url_prefix }}/settings/company">{{ t.company }}</a></p>{% endif %}
 <ul class="list-group mb-3">
 {% for item in items %}
 <li class="list-group-item text-break">
@@ -19,17 +19,17 @@
 </ul>
 <p>{{ t.subtotal }} USD {{ money(sale.gross,2,locale) }}</p>
 <p class="h4">{{ t.total }} USD {{ money(sale.net,2,locale) }}{% if quote %} · PYG {{ money(convert(sale.net,'USD','PYG',quote.pyg_per_usd),0,locale) }}{% endif %}</p>
-{% if sale.title_id %}<p><a href="/finance/{{ sale.title_id }}">{{ t.receivable }} #{{ sale.title_id }}</a></p>{% endif %}
+{% if sale.title_id %}<p><a href="{{ url_prefix }}/finance/{{ sale.title_id }}">{{ t.receivable }} #{{ sale.title_id }}</a></p>{% endif %}
 
 {% if sale.status == 'confirmed' %}
-<form action="/sales/{{ sale.id }}/receipt" method="post" class="mb-3">
+<form action="{{ url_prefix }}/sales/{{ sale.id }}/receipt" method="post" class="mb-3">
   <input type="hidden" name="csrf" value="{{ csrf }}">
   <button class="btn btn-outline-dark">{{ t.receipt_print }}</button>
 </form>
 {% endif %}
 {% if sale.status != 'canceled' %}
 <details><summary>{{ t.cancel }} #{{ sale.id }}</summary>
-  <form action="/sales/{{ sale.id }}/cancel" method="post" class="mt-2"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn btn-outline-danger">{{ t.cancel }} #{{ sale.id }}</button></form>
+  <form action="{{ url_prefix }}/sales/{{ sale.id }}/cancel" method="post" class="mt-2"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn btn-outline-danger">{{ t.cancel }} #{{ sale.id }}</button></form>
 </details>
 {% endif %}
 {% endblock %}

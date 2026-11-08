@@ -3,7 +3,7 @@
 {% block content %}
 <h1>{{ t.operators }}</h1>
 {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
-<form action="/operators" method="post" class="mb-4">
+<form action="{{ url_prefix }}/operators" method="post" class="mb-4">
   <input type="hidden" name="csrf" value="{{ csrf }}">
   <div class="form-group">
     <label for="username">{{ t.username }}</label>
@@ -21,7 +21,7 @@
   <li class="list-group-item d-flex flex-wrap align-items-center justify-content-between">
     <span>{{ username }} · {{ t.active if active else t.inactive }}</span>
     {% if active %}
-    <form action="/operators/{{ id }}/deactivate" method="post">
+    <form action="{{ url_prefix }}/operators/{{ id }}/deactivate" method="post">
       <input type="hidden" name="csrf" value="{{ csrf }}">
       <button class="btn btn-sm btn-outline-danger" type="submit"
               aria-label="{{ t.deactivate }} {{ username }}">{{ t.deactivate }}</button>

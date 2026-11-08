@@ -3,9 +3,9 @@
 {% block title %}{{ t.edit_sku if sku.id else t.create_sku }}{% endblock %}
 {% block content %}
 <h1>{{ t.edit_sku if sku.id else t.create_sku }}</h1>
-<p><a href="/catalog">{{ t.back_catalog }}</a></p>
+<p><a href="{{ url_prefix }}/catalog">{{ t.back_catalog }}</a></p>
 {% if error %}<p class="alert alert-danger" role="alert">{{ t[error] }}</p>{% endif %}
-<form method="post" action="{{ '/catalog/' ~ sku.id ~ '/edit' if sku.id else '/catalog/new' }}">
+<form method="post" action="{{ url_prefix }}{{ '/catalog/' ~ sku.id ~ '/edit' if sku.id else '/catalog/new' }}">
   <input type="hidden" name="csrf" value="{{ csrf }}">
   {% if sku.id %}
   <input type="hidden" name="version" value="{{ sku.version }}">
@@ -29,10 +29,10 @@
 <section class="mt-4" aria-labelledby="photo-title">
   <h2 id="photo-title" class="h4">{{ t.product_photo }}</h2>
   {% if sku.has_image %}
-  <img class="img-thumbnail mb-3" width="240" src="/catalog/{{ sku.id }}/image"
+  <img class="img-thumbnail mb-3" width="240" src="{{ url_prefix }}/catalog/{{ sku.id }}/image"
        alt="{{ t.product_photo }} · {{ sku.description }}">
   {% endif %}
-  <form method="post" action="/catalog/{{ sku.id }}/image" enctype="multipart/form-data">
+  <form method="post" action="{{ url_prefix }}/catalog/{{ sku.id }}/image" enctype="multipart/form-data">
     <input type="hidden" name="csrf" value="{{ csrf }}">
     <input type="hidden" name="version" value="{{ sku.version }}">
     <div class="form-group">
@@ -43,7 +43,7 @@
     <button class="btn btn-primary" type="submit">{{ t.save_photo }}</button>
   </form>
   {% if sku.has_image %}
-  <form class="mt-2" method="post" action="/catalog/{{ sku.id }}/image/remove">
+  <form class="mt-2" method="post" action="{{ url_prefix }}/catalog/{{ sku.id }}/image/remove">
     <input type="hidden" name="csrf" value="{{ csrf }}">
     <input type="hidden" name="version" value="{{ sku.version }}">
     <button class="btn btn-outline-danger" type="submit">{{ t.remove_photo }}</button>

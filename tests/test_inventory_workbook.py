@@ -82,7 +82,7 @@ class StockPolicyAndWorkbookTest(PostgresCase):
         data = BytesIO()
         workbook.save(data)
         reason = "Reposição em lote"
-        status, _, body = upload(path, self.master, data.getvalue(), csrf=token, reason=reason)
+        status, _, body = upload(path, {**self.master, "locale": "pt"}, data.getvalue(), csrf=token, reason=reason)
         self.assertEqual(status, 200)
         self.assertIn(b"Saldo projetado", body)
         self.assertEqual(inventory.history(first, 1)[0], -3)

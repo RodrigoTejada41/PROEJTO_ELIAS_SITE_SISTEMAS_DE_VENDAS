@@ -2,9 +2,9 @@
 {% block title %}{{ t.pricing }}{% endblock %}
 {% block content %}
 <h1>{{ t.pricing if is_master else t.prices }}</h1>
-{% if is_master %}<p><a href="/fx">{{ t.fx }}</a></p>{% endif %}
+{% if is_master %}<p><a href="{{ url_prefix }}/fx">{{ t.fx }}</a></p>{% endif %}
 {% if not quote %}<p class="alert alert-info">{{ t.fx_missing }}</p>{% endif %}
-<form action="/pricing" method="get" class="mb-3">
+<form action="{{ url_prefix }}/pricing" method="get" class="mb-3">
   <label for="q">{{ t.search }}</label><input class="form-control mb-2" id="q" name="q" maxlength="160" value="{{ query }}">
   <button class="btn btn-outline-dark">{{ t.filter }}</button>
 </form>
@@ -19,7 +19,7 @@
   {% if row.usd_cost_minor is not none %}
   <p>{{ t.cost }} USD {{ money(row.usd_cost_minor,2,locale) }}{% if quote %} · PYG {{ money(convert(row.usd_cost_minor,'USD','PYG',quote.pyg_per_usd),0,locale) }}{% endif %}</p>
   {% endif %}
-  <a class="btn btn-sm btn-outline-dark" href="/pricing/{{ row.id }}" aria-label="{{ t.edit_sku }} {{ row.code }}">{{ t.edit_sku }}</a>
+  <a class="btn btn-sm btn-outline-dark" href="{{ url_prefix }}/pricing/{{ row.id }}" aria-label="{{ t.edit_sku }} {{ row.code }}">{{ t.edit_sku }}</a>
   {% endif %}
 </li>
 {% else %}<li class="list-group-item">{{ t.no_skus }}</li>{% endfor %}

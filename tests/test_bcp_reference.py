@@ -1,8 +1,9 @@
 from datetime import datetime, timezone
 from decimal import Decimal
 from unittest import TestCase
+from unittest.mock import patch
 
-from app.fx import parse_reference
+from app.fx import fetch_automatic, parse_alternate, parse_reference
 
 
 class BcpReferenceTest(TestCase):
@@ -19,3 +20,22 @@ class BcpReferenceTest(TestCase):
         self.assertGreater(next_check, now)
         with self.assertRaises(ValueError):
             parse_reference(html.replace("USD", "EUR"), now)
+
+    def test_alternate_quote_validates_base_and_publication(self):
+        now = datetime(2026, 11, 8, 10, tzinfo=timezone.utc)
+        payload = b'{"result":"success","base_code":"USD","time_last_update_unix":1794096000,"rates":{"PYG":6107.599103}}'
+        rate, published, next_check = parse_alternate(payload, now)
+        self.assertEqual(rate, Decimal("6107.599103"))
+        self.assertEqual(int(published.timestamp()), 1794096000)
+        self.assertGreater(next_check, now)
+        for invalid in (payload.replace(b"USD", b"EUR"), payload.replace(b"1794096000", b"1")):
+            with self.assertRaises(ValueError):
+                parse_alternate(invalid, now)
+
+    @patch("app.fx.fetch_alternate")
+    @patch("app.fx.fetch_reference")
+    def test_uses_alternate_only_when_bcp_fails(self, bcp, alternate):
+        self.assertEqual(fetch_automatic(), ("bcp", bcp.return_value))
+        alternate.assert_not_called()
+        bcp.side_effect = OSError("BCP unavailable")
+        self.assertEqual(fetch_automatic(), ("exchangerate_api", alternate.return_value))

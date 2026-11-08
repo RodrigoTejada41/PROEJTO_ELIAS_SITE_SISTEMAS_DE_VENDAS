@@ -8,17 +8,21 @@
 {% if policy.last_checked %}<p>{{ t.fx_checked }} {{ policy.last_checked.isoformat(timespec='minutes') }}</p>{% endif %}
 {% if policy.reference %}
 <p>{{ t.fx_reference }} · 1 USD = {{ policy.reference.pyg_per_usd }} PYG · {{ policy.reference.published_at.isoformat(timespec='minutes') }}</p>
+{% if policy.reference.source == 'exchangerate_api' %}
+<p>{{ t.fx_alternate }} <a href="https://www.exchangerate-api.com" target="_blank" rel="noopener noreferrer">Rates By Exchange Rate API</a></p>
+{% else %}
 <p><a href="https://www.bcp.gov.py/webapps/web/cotizacion/monedas" target="_blank" rel="noopener noreferrer">Banco Central del Paraguay</a></p>
 {% endif %}
-<form action="/fx/refresh" method="post" class="mb-4"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn btn-outline-dark">{{ t.fx_refresh }}</button></form>
+{% endif %}
+<form action="{{ url_prefix }}/fx/refresh" method="post" class="mb-4"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn btn-outline-dark">{{ t.fx_refresh }}</button></form>
 {% if not policy.active %}<p class="alert alert-info">{{ t.fx_missing }}</p>{% endif %}
-<form action="/fx" method="post">
+<form action="{{ url_prefix }}/fx" method="post">
   <input type="hidden" name="csrf" value="{{ csrf }}">
   <div class="form-group">
     <label for="mode">{{ t.fx_mode }}</label>
     <select class="form-control" name="mode" id="mode">
       <option value="manual" {% if policy.mode == 'manual' %}selected{% endif %}>{{ t.fx_manual }}</option>
-      <option value="automatic" {% if policy.mode == 'automatic' %}selected{% endif %}>{{ t.fx_automatic }} · BCP</option>
+      <option value="automatic" {% if policy.mode == 'automatic' %}selected{% endif %}>{{ t.fx_automatic }}</option>
     </select>
   </div>
   <p>{{ t.fx_manual_note }}</p>

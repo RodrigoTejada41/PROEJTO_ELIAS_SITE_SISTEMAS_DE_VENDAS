@@ -12,7 +12,7 @@
 <body>
 <main class="receipt">
   <nav class="d-print-none mb-3" aria-label="{{ t.sales }}">
-    <a class="btn btn-outline-dark" href="/sales/{{ sale.id }}">{{ t.back }}</a>
+    <a class="btn btn-outline-dark" href="{{ url_prefix }}/sales/{{ sale.id }}">{{ t.back }}</a>
     <button class="btn btn-outline-dark" id="receipt-print" type="button">{{ t.receipt_print }}</button>
     <p class="small mt-2">{{ t.receipt_print_hint }}</p>
   </nav>

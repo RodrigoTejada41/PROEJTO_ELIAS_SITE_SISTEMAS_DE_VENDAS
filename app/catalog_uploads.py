@@ -22,7 +22,7 @@ from app.catalog_workbook import ImportErrorAtLine
 from app.web import is_admin_role
 from app.web import (
     NO_STORE, SESSION_COOKIE, TEXT, parse_form, active_session, change_language, check_csrf, master_session,
-    read_form, redirect, render,
+    read_form, redirect, render, request_locale,
 )
 
 router = APIRouter()
@@ -220,9 +220,7 @@ def remove_photo(sku_id: int, request: Request, master=Depends(master_session), 
 
 
 def download_workbook(request, rows, filename, rate=None):
-    locale = request.cookies.get("locale", "pt")
-    if locale not in catalog_workbook.HEADERS:
-        locale = "pt"
+    locale = request_locale(request)
     return Response(
         catalog_workbook.workbook_bytes(locale, rows, TEXT[locale], rate),
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

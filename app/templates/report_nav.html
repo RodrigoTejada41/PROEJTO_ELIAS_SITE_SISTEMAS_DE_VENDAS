@@ -8,8 +8,8 @@
     ('/reports/cash', 'cash_flow', period_link)
   ] %}
   {% if is_master or path == '/reports' %}
-  <a class="btn btn-sm mr-2 mb-2 {{ 'btn-dark' if request.url.path == path else 'btn-outline-dark' }}"
-     href="{{ path ~ '?' ~ filters if filters else path }}" {% if request.url.path == path %}aria-current="page"{% endif %}>{{ t[label] }}</a>
+  <a class="btn btn-sm mr-2 mb-2 {{ 'btn-dark' if route_path == path else 'btn-outline-dark' }}"
+     href="{{ url_prefix }}{{ path ~ '?' ~ filters if filters else path }}" {% if route_path == path %}aria-current="page"{% endif %}>{{ t[label] }}</a>
   {% endif %}
   {% endfor %}
 </nav>
